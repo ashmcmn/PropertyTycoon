@@ -4,6 +4,7 @@ import main.backend.board.Board;
 import main.backend.board.GoSquare;
 import main.backend.board.PropertySquare;
 import main.backend.board.Square;
+import main.backend.dice.Dice;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -38,5 +39,17 @@ class BoardTest {
         board.setSquares(squares);
 
         assertArrayEquals(squares, board.getSquares());
+    }
+
+    @Test
+    void getDice() {
+        assertSame(Dice.class, board.getDice().getClass());
+    }
+
+    @Test
+    void setDice() {
+        Dice newDice = new Dice();
+        board.setDice(newDice);
+        assertEquals(newDice, board.getDice());
     }
 }
