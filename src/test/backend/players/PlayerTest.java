@@ -1,19 +1,25 @@
 package test.backend.players;
 
+import main.backend.board.*;
 import main.backend.players.Player;
 import main.backend.players.Token;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.util.Arrays;
+import java.util.stream.IntStream;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 class PlayerTest {
     Player player;
+    Board board;
 
     @BeforeEach
     void setUp() {
-        player = new Player(Token.BOOT, 1500);
+        board = new Board(new Square[]{});
+        player = new Player(Token.BOOT, 1500, board);
     }
 
     @Test
@@ -36,5 +42,52 @@ class PlayerTest {
     void setCash() {
         player.setCash(2000);
         assertEquals(2000, player.getCash());
+    }
+
+    @Test
+    void getPosition() {
+        assertEquals(0, player.getPosition());
+    }
+
+    @Test
+    void setPosition() {
+        player.setPosition(5);
+        assertEquals(5, player.getPosition());
+    }
+
+    @Test
+    void getBoard() {
+        assertEquals(board, player.getBoard());
+    }
+
+    @Test
+    void setBoard() {
+        Board newBoard = new Board(new Square[]{});
+        player.setBoard(newBoard);
+        assertEquals(newBoard, player.getBoard());
+    }
+
+    @Test
+    void containedMove() {
+        board.setSquares(new Square[]{new GoSquare("Go"), new PropertySquare("Prop"), new TaxSquare("Tax")});
+        player.move(2);
+        assertEquals(2, player.getPosition());
+    }
+
+    @Test
+    void overflowMove() {
+        board.setSquares(new Square[]{new GoSquare("Go"), new PropertySquare("Prop"), new TaxSquare("Tax")});
+        player.move(4);
+        assertEquals(1, player.getPosition());
+    }
+
+    @Test
+    void naturalMove() {
+        board.setSquares(new Square[]{new GoSquare("Go"), new PropertySquare("Prop"), new TaxSquare("Tax")});
+        for (int i = 0; i < 1000; i++) {
+            board.getDice().roll();
+            player.move(IntStream.of(board.getDice().getResult()).sum());
+            assertTrue(player.getPosition() >= 0 && player.getPosition() < board.getSquares().length);
+        }
     }
 }

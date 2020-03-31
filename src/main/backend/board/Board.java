@@ -1,5 +1,7 @@
 package main.backend.board;
 
+import main.backend.dice.Dice;
+
 /**
  * The type Board.
  *
@@ -7,6 +9,7 @@ package main.backend.board;
  */
 public class Board {
     private Square[] squares;
+    private Dice dice;
 
     /**
      * Instantiates a new Board.
@@ -15,6 +18,7 @@ public class Board {
      */
     public Board(Square[] squares) {
         this.squares = squares;
+        this.dice = new Dice();
     }
 
     /**
@@ -33,5 +37,23 @@ public class Board {
      */
     public void setSquares(Square[] squares) {
         this.squares = squares;
+    }
+
+    /**
+     * Gets dice.
+     *
+     * @return the dice
+     */
+    public Dice getDice() {
+        return dice;
+    }
+
+    /**
+     * Sets dice.
+     *
+     * @param dice the dice
+     */
+    public void setDice(Dice dice) {
+        this.dice = dice;
     }
 }
