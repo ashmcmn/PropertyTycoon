@@ -12,8 +12,8 @@ public class Player {
     /**
      * Instantiates a new Player.
      *
-     * @param token The token to represent the player's position on the board
-     * @param cash  The amount of cash currently held by the player
+     * @param token the token to represent the player's position on the board
+     * @param cash  the amount of cash currently held by the player
      */
     public Player(Token token, int cash) {
         this.token = token;
