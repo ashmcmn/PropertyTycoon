@@ -1,6 +1,7 @@
 package test.backend.players;
 
 import main.backend.board.*;
+import main.backend.party.Bank;
 import main.backend.players.Player;
 import main.backend.players.Token;
 import org.junit.jupiter.api.AfterEach;
@@ -18,7 +19,7 @@ class PlayerTest {
 
     @BeforeEach
     void setUp() {
-        board = new Board(new Square[]{});
+        board = new Board(new Square[]{}, new Bank(50000));
         player = new Player(Token.BOOT, 1500, board);
     }
 
@@ -62,7 +63,7 @@ class PlayerTest {
 
     @Test
     void setBoard() {
-        Board newBoard = new Board(new Square[]{});
+        Board newBoard = new Board(new Square[]{}, new Bank(50000));
         player.setBoard(newBoard);
         assertEquals(newBoard, player.getBoard());
     }

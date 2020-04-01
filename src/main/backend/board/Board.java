@@ -1,6 +1,7 @@
 package main.backend.board;
 
 import main.backend.dice.Dice;
+import main.backend.party.Bank;
 
 /**
  * The type Board.
@@ -10,15 +11,18 @@ import main.backend.dice.Dice;
 public class Board {
     private Square[] squares;
     private Dice dice;
+    private Bank bank;
 
     /**
      * Instantiates a new Board.
      *
      * @param squares the squares the board contains
+     * @param bank    the bank
      */
-    public Board(Square[] squares) {
+    public Board(Square[] squares, Bank bank) {
         this.squares = squares;
         this.dice = new Dice();
+        this.bank = bank;
     }
 
     /**
@@ -55,5 +59,23 @@ public class Board {
      */
     public void setDice(Dice dice) {
         this.dice = dice;
+    }
+
+    /**
+     * Gets bank.
+     *
+     * @return the bank
+     */
+    public Bank getBank() {
+        return bank;
+    }
+
+    /**
+     * Sets bank.
+     *
+     * @param bank the bank
+     */
+    public void setBank(Bank bank) {
+        this.bank = bank;
     }
 }
