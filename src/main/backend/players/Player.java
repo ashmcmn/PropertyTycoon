@@ -1,13 +1,14 @@
 package main.backend.players;
 
 import main.backend.board.Board;
+import main.backend.party.Party;
 
 /**
  * The type Player.
  *
  * @author Ashley McManamon
  */
-public class Player {
+public class Player implements Party {
     private Token token;
     private int cash;
     private int position;
