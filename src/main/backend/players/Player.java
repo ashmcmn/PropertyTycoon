@@ -103,9 +103,15 @@ public class Player implements Party {
      * Move the player
      *
      * @param amount the amount of squares to travel
+     * @param collectSalary whether or not to collect £200 salary passing Go
      */
-    public void move(int amount) {
+    public void move(int amount, boolean collectSalary) {
         int newPosition = (getPosition() + amount) % board.getSquares().length;
+
+        if(newPosition < getPosition() && collectSalary){
+            setCash(getCash() + 200);
+        }
+
         setPosition(newPosition);
     }
 }

@@ -71,14 +71,14 @@ class PlayerTest {
     @Test
     void containedMove() {
         board.setSquares(new Square[]{new GoSquare("Go"), new PropertySquare("Prop"), new TaxSquare("Tax")});
-        player.move(2);
+        player.move(2, true);
         assertEquals(2, player.getPosition());
     }
 
     @Test
     void overflowMove() {
         board.setSquares(new Square[]{new GoSquare("Go"), new PropertySquare("Prop"), new TaxSquare("Tax")});
-        player.move(4);
+        player.move(4, true);
         assertEquals(1, player.getPosition());
     }
 
@@ -87,8 +87,16 @@ class PlayerTest {
         board.setSquares(new Square[]{new GoSquare("Go"), new PropertySquare("Prop"), new TaxSquare("Tax")});
         for (int i = 0; i < 1000; i++) {
             board.getDice().roll();
-            player.move(IntStream.of(board.getDice().getResult()).sum());
+            player.move(IntStream.of(board.getDice().getResult()).sum(), true);
             assertTrue(player.getPosition() >= 0 && player.getPosition() < board.getSquares().length);
         }
+    }
+
+    @Test
+    void collectsSalary() {
+        board.setSquares(new Square[]{new GoSquare("Go"), new PropertySquare("Prop"), new TaxSquare("Tax")});
+        player.setPosition(1);
+        player.move(2, true);
+        assertEquals(1700, player.getCash());
     }
 }
