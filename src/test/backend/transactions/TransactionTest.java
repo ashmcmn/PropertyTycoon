@@ -30,7 +30,11 @@ class TransactionTest {
     @Test
     void settleCash() {
         transaction = new Transaction(p, p2, new Object[]{100}, new Object[]{});
+
+        assertTrue(transaction.canSettle());
+
         transaction.settle();
+
         assertEquals(1400, p.getCash());
         assertEquals(1600, p2.getCash());
     }
@@ -41,6 +45,9 @@ class TransactionTest {
         p.addProperty(prop);
 
         transaction = new Transaction(p, p2, new Object[]{prop}, new Object[]{});
+
+        assertTrue(transaction.canSettle());
+
         transaction.settle();
 
         assertEquals(List.of(prop), p2.getProperties());
@@ -52,9 +59,19 @@ class TransactionTest {
         p.addProperty(prop);
 
         transaction = new Transaction(p, p2, new Object[]{prop}, new Object[]{200});
+
+        assertTrue(transaction.canSettle());
+
         transaction.settle();
 
         assertEquals(List.of(prop), p2.getProperties());
         assertEquals(1300, p2.getCash());
+    }
+
+    @Test
+    void cantAffordSettle() {
+        p.setCash(80);
+        transaction = new Transaction(p, p2, new Object[]{100}, new Object[]{});
+        assertFalse(transaction.canSettle());
     }
 }

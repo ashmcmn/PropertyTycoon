@@ -30,6 +30,31 @@ public class Transaction {
     }
 
     /**
+     * Checks whether player's have the game assets to allow the transaction to settle
+     *
+     * @return the outcome of the check
+     */
+    public boolean canSettle() {
+        for (Object item : oneToTwo) {
+            if(item instanceof Integer && partyOne.getCash() < (Integer) item){
+                return false;
+            }
+            else if(item instanceof PropertySquare && !partyOne.getProperties().contains(item)){
+                return false;
+            }
+        }
+        for (Object item : twoToOne) {
+            if(item instanceof Integer && partyTwo.getCash() < (Integer) item){
+                return false;
+            }
+            else if(item instanceof PropertySquare && !partyTwo.getProperties().contains(item)){
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /**
      * Settles the transaction by making the necessary game asset transfers
      */
     public void settle() {
