@@ -4,11 +4,11 @@ import main.backend.board.*;
 import main.backend.party.Bank;
 import main.backend.players.Player;
 import main.backend.players.Token;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import java.util.Arrays;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.stream.IntStream;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -70,21 +70,21 @@ class PlayerTest {
 
     @Test
     void containedMove() {
-        board.setSquares(new Square[]{new GoSquare("Go"), new PropertySquare("Prop"), new TaxSquare("Tax")});
+        board.setSquares(new Square[]{new GoSquare("Go"), new PropertySquare("Prop", board.getBank()), new TaxSquare("Tax")});
         player.move(2, true);
         assertEquals(2, player.getPosition());
     }
 
     @Test
     void overflowMove() {
-        board.setSquares(new Square[]{new GoSquare("Go"), new PropertySquare("Prop"), new TaxSquare("Tax")});
+        board.setSquares(new Square[]{new GoSquare("Go"), new PropertySquare("Prop", board.getBank()), new TaxSquare("Tax")});
         player.move(4, true);
         assertEquals(1, player.getPosition());
     }
 
     @Test
     void naturalMove() {
-        board.setSquares(new Square[]{new GoSquare("Go"), new PropertySquare("Prop"), new TaxSquare("Tax")});
+        board.setSquares(new Square[]{new GoSquare("Go"), new PropertySquare("Prop", board.getBank()), new TaxSquare("Tax")});
         for (int i = 0; i < 1000; i++) {
             board.getDice().roll();
             player.move(IntStream.of(board.getDice().getResult()).sum(), true);
@@ -94,9 +94,35 @@ class PlayerTest {
 
     @Test
     void collectsSalary() {
-        board.setSquares(new Square[]{new GoSquare("Go"), new PropertySquare("Prop"), new TaxSquare("Tax")});
+        board.setSquares(new Square[]{new GoSquare("Go"), new PropertySquare("Prop", board.getBank()), new TaxSquare("Tax")});
         player.setPosition(1);
         player.move(2, true);
         assertEquals(1700, player.getCash());
+    }
+
+    @Test
+    void getProperties() {
+        List<PropertySquare> props = new ArrayList<>();
+        assertEquals(props, player.getProperties());
+    }
+
+    @Test
+    void addProperty() {
+        PropertySquare prop = new PropertySquare("Prop", board.getBank());
+        List<PropertySquare> props = new ArrayList<>();
+        props.add(prop);
+        player.addProperty(prop);
+        assertEquals(props, player.getProperties());
+    }
+
+    @Test
+    void removeProperty() {
+        PropertySquare prop = new PropertySquare("Prop", board.getBank());
+        List<PropertySquare> props = new ArrayList<>();
+        props.add(prop);
+        player.addProperty(prop);
+        assertEquals(props, player.getProperties());
+        player.removeProperty(prop);
+        assertEquals(new ArrayList<>(), player.getProperties());
     }
 }

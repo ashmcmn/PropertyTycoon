@@ -1,12 +1,18 @@
 package main.backend.party;
 
+import main.backend.board.PropertySquare;
+
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * The type Bank.
  *
  * @author Ashley McManamon
  */
-public class Bank {
+public class Bank implements Party{
     private int cash;
+    private List<PropertySquare> properties;
 
     /**
      * Instantiates a new Bank.
@@ -15,6 +21,7 @@ public class Bank {
      */
     public Bank(int cash) {
         this.cash = cash;
+        this.properties = new ArrayList<>();
     }
 
     /**
@@ -33,5 +40,32 @@ public class Bank {
      */
     public void setCash(int cash) {
         this.cash = cash;
+    }
+
+    /**
+     * Gets properties owned by the player
+     *
+     * @return the properties
+     */
+    public List<PropertySquare> getProperties() {
+        return properties;
+    }
+
+    /**
+     * Add a property to the player's ownership
+     *
+     * @param property the property
+     */
+    public void addProperty(PropertySquare property) {
+        this.properties.add(property);
+    }
+
+    /**
+     * Remove a property from the player's ownership
+     *
+     * @param property the property
+     */
+    public void removeProperty(PropertySquare property) {
+        this.properties.remove(property);
     }
 }

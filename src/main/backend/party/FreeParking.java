@@ -1,11 +1,15 @@
 package main.backend.party;
 
+import main.backend.board.PropertySquare;
+
+import java.util.List;
+
 /**
  * The type Free parking.
  *
  * @author Ashley McManamon
  */
-public class FreeParking {
+public class FreeParking implements Party{
     private int cash;
 
     /**
@@ -33,5 +37,15 @@ public class FreeParking {
      */
     public void setCash(int cash) {
         this.cash = cash;
+    }
+
+    public List<PropertySquare> getProperties() {
+        return null;
+    }
+
+    public void addProperty(PropertySquare property) {
+    }
+
+    public void removeProperty(PropertySquare property) {
     }
 }

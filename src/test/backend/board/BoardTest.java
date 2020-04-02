@@ -6,7 +6,6 @@ import main.backend.board.PropertySquare;
 import main.backend.board.Square;
 import main.backend.dice.Dice;
 import main.backend.party.Bank;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -19,11 +18,11 @@ class BoardTest {
 
     @BeforeEach
     void setUp() {
+        bank = new Bank(50000);
         squares = new Square[]{
                 new GoSquare("Go"),
-                new PropertySquare("Prop1")
+                new PropertySquare("Prop1", bank)
         };
-        bank = new Bank(50000);
         board = new Board(squares, bank);
     }
 
@@ -36,7 +35,7 @@ class BoardTest {
     void setSquares() {
         squares = new Square[]{
                 new GoSquare("Go"),
-                new PropertySquare("Prop2")
+                new PropertySquare("Prop2", bank)
         };
 
         board.setSquares(squares);

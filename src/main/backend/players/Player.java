@@ -1,7 +1,11 @@
 package main.backend.players;
 
 import main.backend.board.Board;
+import main.backend.board.PropertySquare;
 import main.backend.party.Party;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * The type Player.
@@ -13,18 +17,21 @@ public class Player implements Party {
     private int cash;
     private int position;
     private Board board;
+    private List<PropertySquare> properties;
 
     /**
      * Instantiates a new Player.
      *
      * @param token the token to represent the player's position on the board
      * @param cash  the amount of cash currently held by the player
+     * @param board the board
      */
     public Player(Token token, int cash, Board board) {
         this.token = token;
         this.cash = cash;
         this.position = 0;
         this.board = board;
+        this.properties = new ArrayList<>();
     }
 
     /**
@@ -102,7 +109,7 @@ public class Player implements Party {
     /**
      * Move the player
      *
-     * @param amount the amount of squares to travel
+     * @param amount        the amount of squares to travel
      * @param collectSalary whether or not to collect £200 salary passing Go
      */
     public void move(int amount, boolean collectSalary) {
@@ -113,5 +120,32 @@ public class Player implements Party {
         }
 
         setPosition(newPosition);
+    }
+
+    /**
+     * Gets properties owned by the player
+     *
+     * @return the properties
+     */
+    public List<PropertySquare> getProperties() {
+        return properties;
+    }
+
+    /**
+     * Add a property to the player's ownership
+     *
+     * @param property the property
+     */
+    public void addProperty(PropertySquare property) {
+        this.properties.add(property);
+    }
+
+    /**
+     * Remove a property from the player's ownership
+     *
+     * @param property the property
+     */
+    public void removeProperty(PropertySquare property) {
+        this.properties.remove(property);
     }
 }

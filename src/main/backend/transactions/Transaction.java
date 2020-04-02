@@ -1,5 +1,6 @@
 package main.backend.transactions;
 
+import main.backend.board.PropertySquare;
 import main.backend.party.Party;
 
 /**
@@ -37,12 +38,22 @@ public class Transaction {
                 partyOne.setCash(partyOne.getCash() - ((Integer) item));
                 partyTwo.setCash(partyTwo.getCash() + ((Integer) item));
             }
+            else if(item instanceof PropertySquare){
+                partyOne.removeProperty((PropertySquare) item);
+                partyTwo.addProperty((PropertySquare) item);
+                ((PropertySquare) item).setOwner(partyTwo);
+            }
         }
 
         for (Object item : twoToOne) {
             if(item instanceof Integer){
                 partyTwo.setCash(partyTwo.getCash() - ((Integer) item));
                 partyOne.setCash(partyOne.getCash() + ((Integer) item));
+            }
+            else if(item instanceof PropertySquare){
+                partyTwo.removeProperty((PropertySquare) item);
+                partyOne.addProperty((PropertySquare) item);
+                ((PropertySquare) item).setOwner(partyOne);
             }
         }
     }
