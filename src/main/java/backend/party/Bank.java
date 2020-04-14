@@ -1,6 +1,6 @@
 package backend.party;
 
-import main.backend.board.PropertySquare;
+import backend.board.PropertySquare;
 
 import java.util.ArrayList;
 import java.util.List;

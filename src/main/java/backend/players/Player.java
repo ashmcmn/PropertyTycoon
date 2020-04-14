@@ -1,6 +1,7 @@
 package backend.players;
 
 import backend.board.Board;
+import backend.board.PropertySquare;
 import backend.party.Party;
 
 import java.util.ArrayList;

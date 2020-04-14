@@ -1,6 +1,7 @@
 package backend.transactions;
 
 import backend.board.Board;
+import backend.board.PropertySquare;
 import backend.board.Square;
 import backend.party.Bank;
 import backend.players.Player;

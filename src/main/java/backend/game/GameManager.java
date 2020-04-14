@@ -1,6 +1,7 @@
 package backend.game;
 
 import backend.board.Board;
+import backend.board.PropertySquare;
 import backend.board.Square;
 import backend.players.Player;
 import org.json.simple.JSONArray;
@@ -16,6 +17,7 @@ import java.io.IOException;
  */
 public class GameManager {
     private Board board;
+
     private Player currentPlayer;
 
     /**
@@ -43,6 +45,15 @@ public class GameManager {
      */
     public void setBoard(Board board) {
         this.board = board;
+    }
+
+    /**
+     * Gets the current player.
+     *
+     * @return the current player
+     */
+    public Player getCurrentPlayer() {
+        return currentPlayer;
     }
 
     /**
@@ -83,7 +94,7 @@ public class GameManager {
             boolean ownable = (importSquare.get("ownable")).equals("Yes");
 
             if(ownable){
-                // do stuff here when master updated
+                newSquare = new PropertySquare((String) importSquare.get("name"), this.getBoard().getBank());
             } else {
                 newSquare = new Square((String) importSquare.get("name"));
             }

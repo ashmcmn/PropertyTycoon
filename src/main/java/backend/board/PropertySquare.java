@@ -1,6 +1,6 @@
 package backend.board;
 
-import main.backend.party.Party;
+import backend.party.Party;
 
 /**
  * The type Property square.

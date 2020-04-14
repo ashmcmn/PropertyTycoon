@@ -1,5 +1,6 @@
 package backend.transactions;
 
+import backend.board.PropertySquare;
 import backend.party.Party;
 
 /**
