@@ -22,11 +22,11 @@ class BoardTest {
 
     @BeforeEach
     void setUp() {
+        bank = new Bank(50000);
         squares = new Square[]{
                 new GoSquare("Go"),
-                new PropertySquare("Prop1")
+                new PropertySquare("Prop1", bank)
         };
-        bank = new Bank(50000);
         board = new Board(squares, bank, new ArrayList<Player>());
     }
 
@@ -39,7 +39,7 @@ class BoardTest {
     void setSquares() {
         squares = new Square[]{
                 new GoSquare("Go"),
-                new PropertySquare("Prop2")
+                new PropertySquare("Prop2", bank)
         };
 
         board.setSquares(squares);
