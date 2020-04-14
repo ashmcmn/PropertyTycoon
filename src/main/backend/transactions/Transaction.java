@@ -1,5 +1,6 @@
 package main.backend.transactions;
 
+import main.backend.board.PropertySquare;
 import main.backend.party.Party;
 
 /**
@@ -29,6 +30,31 @@ public class Transaction {
     }
 
     /**
+     * Checks whether player's have the game assets to allow the transaction to settle
+     *
+     * @return the outcome of the check
+     */
+    public boolean canSettle() {
+        for (Object item : oneToTwo) {
+            if(item instanceof Integer && partyOne.getCash() < (Integer) item){
+                return false;
+            }
+            else if(item instanceof PropertySquare && !partyOne.getProperties().contains(item)){
+                return false;
+            }
+        }
+        for (Object item : twoToOne) {
+            if(item instanceof Integer && partyTwo.getCash() < (Integer) item){
+                return false;
+            }
+            else if(item instanceof PropertySquare && !partyTwo.getProperties().contains(item)){
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /**
      * Settles the transaction by making the necessary game asset transfers
      */
     public void settle() {
@@ -37,12 +63,22 @@ public class Transaction {
                 partyOne.setCash(partyOne.getCash() - ((Integer) item));
                 partyTwo.setCash(partyTwo.getCash() + ((Integer) item));
             }
+            else if(item instanceof PropertySquare){
+                partyOne.removeProperty((PropertySquare) item);
+                partyTwo.addProperty((PropertySquare) item);
+                ((PropertySquare) item).setOwner(partyTwo);
+            }
         }
 
         for (Object item : twoToOne) {
             if(item instanceof Integer){
                 partyTwo.setCash(partyTwo.getCash() - ((Integer) item));
                 partyOne.setCash(partyOne.getCash() + ((Integer) item));
+            }
+            else if(item instanceof PropertySquare){
+                partyTwo.removeProperty((PropertySquare) item);
+                partyOne.addProperty((PropertySquare) item);
+                ((PropertySquare) item).setOwner(partyOne);
             }
         }
     }
