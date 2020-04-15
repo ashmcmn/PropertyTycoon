@@ -1,5 +1,7 @@
 package backend.board;
 
+import backend.cards.Card;
+import backend.cards.CardPile;
 import backend.players.Player;
 
 /**
@@ -8,13 +10,16 @@ import backend.players.Player;
  * @author Ashley McManamon
  */
 public class CardDrawSquare extends Square {
+    private CardPile cardPile;
+
     /**
      * Instantiates a new Square.
      *
      * @param name the name of the square
      */
-    public CardDrawSquare(String name) {
+    public CardDrawSquare(String name, CardPile cardPile) {
         super(name);
+        this.cardPile = cardPile;
     }
 
     /**
@@ -25,6 +30,13 @@ public class CardDrawSquare extends Square {
      */
     @Override
     public void doAction(Player player, Board board) {
-        //TODO
+        Card card = cardPile.draw();
+        if(card.getDescription().equals("Get out of jail free")){
+            //TODO
+        }
+        else{
+            card.doAction(player, board);
+            cardPile.addCard(card);
+        }
     }
 }

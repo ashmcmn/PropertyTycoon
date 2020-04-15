@@ -20,7 +20,7 @@ class PlayerTest {
     @BeforeEach
     void setUp() {
         board = new Board(new Square[]{}, new Bank(50000), new ArrayList<>());
-        player = new Player(Token.BOOT, 1500, board);
+        player = new Player("P1", Token.BOOT, 1500);
     }
 
     @Test
