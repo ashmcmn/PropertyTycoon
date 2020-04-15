@@ -2,6 +2,7 @@ package backend.players;
 
 import backend.board.Board;
 import backend.board.PropertySquare;
+import backend.board.Square;
 import backend.party.Party;
 
 import java.util.ArrayList;
@@ -13,6 +14,7 @@ import java.util.List;
  * @author Ashley McManamon
  */
 public class Player implements Party {
+    private String name;
     private Token token;
     private int cash;
     private int position;
@@ -22,17 +24,24 @@ public class Player implements Party {
     /**
      * Instantiates a new Player.
      *
+     * @param name the player's name
      * @param token the token to represent the player's position on the board
      * @param cash  the amount of cash currently held by the player
-     * @param board the board
      */
-    public Player(Token token, int cash, Board board) {
+    public Player(String name, Token token, int cash) {
+        this.name = name;
         this.token = token;
         this.cash = cash;
         this.position = 0;
-        this.board = board;
         this.properties = new ArrayList<>();
     }
+
+    /**
+     * Gets player's name.
+     *
+     * @return the name
+     */
+    public String getName() { return name; }
 
     /**
      * Gets token.
@@ -111,8 +120,9 @@ public class Player implements Party {
      *
      * @param amount        the amount of squares to travel
      * @param collectSalary whether or not to collect £200 salary passing Go
+     * @return the player's new square
      */
-    public void move(int amount, boolean collectSalary) {
+    public Square move(int amount, boolean collectSalary) {
         int newPosition = (getPosition() + amount) % board.getSquares().length;
 
         if(newPosition < getPosition() && collectSalary){
@@ -120,6 +130,8 @@ public class Player implements Party {
         }
 
         setPosition(newPosition);
+
+        return board.getSquares()[newPosition];
     }
 
     /**
