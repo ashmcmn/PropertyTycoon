@@ -1,5 +1,7 @@
 package backend.board;
 
+import backend.players.Player;
+
 /**
  * The type Tax square.
  *
@@ -13,5 +15,16 @@ public class TaxSquare extends Square {
      */
     public TaxSquare(String name) {
         super(name);
+    }
+
+    /**
+     * Player pays tax to the bank
+     *
+     * @param player the player
+     * @param board  the board
+     */
+    @Override
+    public void doAction(Player player, Board board) {
+        //TODO
     }
 }

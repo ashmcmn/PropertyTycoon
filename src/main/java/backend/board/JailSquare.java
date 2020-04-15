@@ -1,5 +1,7 @@
 package backend.board;
 
+import backend.players.Player;
+
 /**
  * The type Jail square.
  *
@@ -13,5 +15,16 @@ public class JailSquare extends Square {
      */
     public JailSquare(String name) {
         super(name);
+    }
+
+    /**
+     * Empty functions
+     *
+     * @param player the player
+     * @param board  the board
+     */
+    @Override
+    public void doAction(Player player, Board board) {
+
     }
 }

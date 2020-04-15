@@ -1,5 +1,7 @@
 package backend.board;
 
+import backend.players.Player;
+
 /**
  * The type Card draw square.
  *
@@ -13,5 +15,16 @@ public class CardDrawSquare extends Square {
      */
     public CardDrawSquare(String name) {
         super(name);
+    }
+
+    /**
+     * Draws a card for the player
+     *
+     * @param player the player
+     * @param board  the board
+     */
+    @Override
+    public void doAction(Player player, Board board) {
+        //TODO
     }
 }

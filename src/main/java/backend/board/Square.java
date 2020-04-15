@@ -1,11 +1,13 @@
 package backend.board;
 
+import backend.players.Player;
+
 /**
  * The type Square.
  *
  * @author Ashley McManamon
  */
-public class Square {
+public abstract class Square {
     private String name;
 
     /**
@@ -34,4 +36,12 @@ public class Square {
     public void setName(String name) {
         this.name = name;
     }
+
+    /**
+     * Abstract function for completing actions
+     *
+     * @param player the player
+     * @param board  the board
+     */
+    public abstract void doAction(Player player, Board board);
 }
