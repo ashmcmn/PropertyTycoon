@@ -32,6 +32,10 @@ public class Board {
         this.bank = bank;
         this.freeParking = new FreeParking(0);
         this.players = players;
+        for (Player player : players
+             ) {
+            player.setBoard(this);
+        }
     }
 
     /**

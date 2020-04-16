@@ -32,10 +32,10 @@ public class CardDrawSquare extends Square {
     public void doAction(Player player, Board board) {
         Card card = cardPile.draw();
         if(card.getDescription().equals("Get out of jail free")){
-            //TODO
+            player.addGoof();
         }
         else{
-            card.doAction(player, board);
+            card.doAction();
             cardPile.addCard(card);
         }
     }

@@ -30,8 +30,8 @@ public class Card {
         return description;
     }
 
-    public void doAction(Player player, Board board) {
-        action.action(player, board);
+    public void doAction() {
+        action.action();
     }
 
 }

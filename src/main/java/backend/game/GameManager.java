@@ -81,6 +81,15 @@ public class GameManager {
     }
 
     /**
+     * Sets the current player.
+     *
+     * @return the current player
+     */
+    public void setCurrentPlayer(Player currentPlayer) {
+        this.currentPlayer = currentPlayer;
+    }
+
+    /**
      * Starts the game.
      */
     public void startGame(){
@@ -165,9 +174,87 @@ public class GameManager {
                     }
 
                     card = new Card((String) jsonCard.get("description"), new Action() {
-                        @Override
-                        public void action(Player player, Board board) {
-                            Transaction transaction = new Transaction(from, to, new Object[]{jsonCard.get("amount")}, new Object[]{});
+                        public void action() {
+                            Transaction transaction = new Transaction(from, to, new Object[]{((Long) jsonCard.get("amount")).intValue()}, new Object[]{});
+                            if(transaction.canSettle())
+                                transaction.settle();
+                        }
+                    });
+                }
+                else if(jsonCard.get("actiontype").equals("Move")){
+                    int where = ((Long) jsonCard.get("where")).intValue();
+                    boolean collect = (boolean) jsonCard.get("collect");
+
+                    card = new Card((String) jsonCard.get("description"), new Action() {
+                        public void action() {
+                            currentPlayer.move(where - currentPlayer.getPosition(), collect);
+                        }
+                    });
+                }
+                else if(jsonCard.get("actiontype").equals("PayDraw")){
+
+                        String newPile = (String) jsonCard.get("pile");
+
+                        Party from;
+                        Party to;
+                        switch(((String) jsonCard.get("from"))){
+                            case "Bank":
+                                from = this.board.getBank();
+                                break;
+                            case "Player":
+                                from = this.currentPlayer;
+                                break;
+                            default:
+                                throw new IllegalStateException("Unexpected value: " + ((String) jsonCard.get("from")));
+                        }
+
+                        switch(((String) jsonCard.get("to"))){
+                            case "Bank":
+                                to = this.board.getBank();
+                                break;
+                            case "Player":
+                                to = this.currentPlayer;
+                                break;
+                            case "FreeParking":
+                                to = this.board.getFreeParking();
+                                break;
+                            default:
+                                throw new IllegalStateException("Unexpected value: " + ((String) jsonCard.get("to")));
+                        }
+
+                        card = new Card((String) jsonCard.get("description"), new Action() {
+                            public void action() {
+                                Random rand = new Random();
+                                if(rand.nextInt(2) == 0) {
+                                    Transaction transaction = new Transaction(from, to, new Object[]{((Long) jsonCard.get("amount")).intValue()}, new Object[]{});
+                                    if (transaction.canSettle())
+                                        transaction.settle();
+                                }
+                                else {
+                                    Card newCard = cardPiles.get(newPile).draw();
+                                    if(newCard.getDescription().equals("Get out of jail free")){
+                                        currentPlayer.addGoof();
+                                    }
+                                    else{
+                                        newCard.doAction();
+                                        cardPiles.get(newPile).addCard(newCard);
+                                    }
+                                }
+                            }
+                        });
+                }
+                else if(jsonCard.get("actiontype").equals("GoJail")){
+                    card = new Card((String) jsonCard.get("description"), new Action() {
+                        public void action() {
+                            currentPlayer.sendToJail();
+                        }
+                    });
+                }
+                else if(jsonCard.get("actiontype").equals("PayRes")){
+                    card = new Card((String) jsonCard.get("description"), new Action() {
+                        public void action() {
+                            int total = 0;
+                            //TODO: add once improvements are implemented
                         }
                     });
                 }

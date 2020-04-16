@@ -312,6 +312,111 @@
     "cardPiles":
     [
       {
+        "name": "Opportunity Knocks",
+        "cards": [
+          {
+            "description": "Bank pays you divided of £50",
+            "actiontype": "Pay",
+            "amount": 50,
+            "from": "Bank",
+            "to": "Player"
+          },
+          {
+            "description": "You have won a lip sync battle. Collect £100",
+            "actiontype": "Pay",
+            "amount": 100,
+            "from": "Bank",
+            "to": "Player"
+          },
+          {
+            "description": "Advance to Turing Heights",
+            "actiontype": "Move",
+            "where": 40,
+            "collect": true
+          },
+          {
+            "description": "Advance to Han Xin Gardens. If you pass GO, collect £200",
+            "actiontype": "Move",
+            "where": 25,
+            "collect": true
+          },
+          {
+            "description": "Fined £15 for speeding",
+            "actiontype": "Pay",
+            "amount": 15,
+            "from": "Player",
+            "to": "FreeParking"
+          },
+          {
+            "description": "Pay university fees of £150",
+            "actiontype": "Pay",
+            "amount": 150,
+            "from": "Player",
+            "to": "Bank"
+          },
+          {
+            "description": "Take a trip to Hove station. If you pass GO collect £200",
+            "actiontype": "Move",
+            "where": 16,
+            "collect": true
+          },
+          {
+            "description": "Loan matures, collect £150",
+            "actiontype": "Pay",
+            "amount": 150,
+            "from": "Bank",
+            "to": "Player"
+          },
+          {
+            "description": "You are assessed for repairs, £40/house, £115/hotel",
+            "actiontype": "PayRes",
+            "amount": "40, 115",
+            "from": "Player",
+            "to": "Bank"
+          },
+          {
+            "description": "Advance to GO",
+            "actiontype": "Move",
+            "where": 1,
+            "collect": true
+          },
+          {
+            "description": "You are assessed for repairs, £25/house, £100/hotel",
+            "actiontype": "PayRes",
+            "amount": "25, 100",
+            "from": "Player",
+            "to": "Bank"
+          },
+          {
+            "description": "Go back 3 spaces",
+            "actiontype": "MoveBack",
+            "where": 3,
+            "collect": false
+          },
+          {
+            "description": "Advance to Skywalker Drive. If you pass GO collect £200",
+            "actiontype": "Move",
+            "where": 12,
+            "collect": true
+          },
+          {
+            "description": "Go to jail. Do not pass GO, do not collect £200",
+            "actiontype": "GoJail"
+          },
+          {
+            "description": "Drunk in charge of a skateboard. Fine £20",
+            "actiontype": "Pay",
+            "amount": 20,
+            "from": "Player",
+            "to": "FreeParking"
+          },
+          {
+            "description": "Get out of jail free",
+            "actiontype": "GOOF"
+          }
+        ]
+      },
+      {
         "name": "Pot Luck",
         "cards": [
           {
@@ -331,7 +436,8 @@
           {
             "description": "Go back to Crapper Street",
             "actiontype": "Move",
-            "where": 2
+            "where": 2,
+            "collect": false
           },
           {
             "description": "Student loan refund. Collect £20",
@@ -364,7 +470,8 @@
           {
             "description": "Advance to go",
             "actiontype": "Move",
-            "where": 1
+            "where": 1,
+            "collect": true
           },
           {
             "description": "From sale of Bitcoin you get £50",
@@ -378,7 +485,8 @@
             "actiontype": "PayDraw",
             "amount": 10,
             "from": "Player",
-            "to": "FreeParking"
+            "to": "FreeParking",
+            "pile": "Opportunity Knocks"
           },
           {
             "description": "Pay insurance fee of £50",
@@ -411,105 +519,6 @@
             "amount": 10,
             "from": "All",
             "to": "Player"
-          },
-          {
-            "description": "Get out of jail free",
-            "actiontype": "GOOF"
-          }
-        ]
-      },
-      {
-        "name": "Opportunity Costs",
-        "cards": [
-          {
-            "description": "Bank pays you divided of £50",
-            "actiontype": "Pay",
-            "amount": 50,
-            "from": "Bank",
-            "to": "Player"
-          },
-          {
-            "description": "You have won a lip sync battle. Collect £100",
-            "actiontype": "Pay",
-            "amount": 100,
-            "from": "Bank",
-            "to": "Player"
-          },
-          {
-            "description": "Advance to Turing Heights",
-            "actiontype": "Move",
-            "where": 40
-          },
-          {
-            "description": "Advance to Han Xin Gardens. If you pass GO, collect £200",
-            "actiontype": "Move",
-            "where": 25
-          },
-          {
-            "description": "Fined £15 for speeding",
-            "actiontype": "Pay",
-            "amount": 15,
-            "from": "Player",
-            "to": "FreeParking"
-          },
-          {
-            "description": "Pay university fees of £150",
-            "actiontype": "Pay",
-            "amount": 150,
-            "from": "Player",
-            "to": "Bank"
-          },
-          {
-            "description": "Take a trip to Hove station. If you pass GO collect £200",
-            "actiontype": "Move",
-            "where": 16
-          },
-          {
-            "description": "Loan matures, collect £150",
-            "actiontype": "Pay",
-            "amount": 150,
-            "from": "Bank",
-            "to": "Player"
-          },
-          {
-            "description": "You are assessed for repairs, £40/house, £115/hotel",
-            "actiontype": "PayRes",
-            "amount": "40, 115",
-            "from": "Player",
-            "to": "Bank"
-          },
-          {
-            "description": "Advance to GO",
-            "actiontype": "Move",
-            "where": 1
-          },
-          {
-            "description": "You are assessed for repairs, £25/house, £100/hotel",
-            "actiontype": "PayRes",
-            "amount": "25, 100",
-            "from": "Player",
-            "to": "Bank"
-          },
-          {
-            "description": "Go back 3 spaces",
-            "actiontype": "MoveBack",
-            "where": 3
-          },
-          {
-            "description": "Advance to Skywalker Drive. If you pass GO collect £200",
-            "actiontype": "Move",
-            "where": 12
-          },
-          {
-            "description": "Go to jail. Do not pass GO, do not collect £200",
-            "actiontype": "GoJail"
-          },
-          {
-            "description": "Drunk in charge of a skateboard. Fine £20",
-            "actiontype": "Pay",
-            "amount": 20,
-            "from": "Player",
-            "to": "FreeParking"
           },
           {
             "description": "Get out of jail free",

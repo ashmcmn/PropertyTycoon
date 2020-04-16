@@ -7,13 +7,7 @@ import backend.players.Player;
  * The interface Action.
  */
 public interface Action {
-    /**
-     * Action.
-     *
-     * @param player the player
-     * @param board the board
-     */
-    default void action(Player player, Board board){
+    default void action(){
 
     }
 }

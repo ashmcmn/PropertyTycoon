@@ -9,6 +9,7 @@ import backend.players.Player;
  */
 public abstract class Square {
     private String name;
+    private int position;
 
     /**
      * Instantiates a new Square.
@@ -36,6 +37,13 @@ public abstract class Square {
     public void setName(String name) {
         this.name = name;
     }
+
+    /**
+     * Gets the position of this square on the board
+     *
+     * @return the position
+     */
+    public int getPosition() { return position; }
 
     /**
      * Abstract function for completing actions
