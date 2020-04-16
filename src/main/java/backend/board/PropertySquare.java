@@ -11,6 +11,7 @@ import backend.transactions.Transaction;
  */
 public class PropertySquare extends Square {
     private Party owner;
+    private int[] rents;
 
     /**
      * Instantiates a new Square.
@@ -18,9 +19,10 @@ public class PropertySquare extends Square {
      * @param name  the name of the square
      * @param owner the owner
      */
-    public PropertySquare(String name, Party owner) {
+    public PropertySquare(String name, Party owner, int[] rents) {
         super(name);
         this.owner = owner;
+        this.rents = rents;
     }
 
     /**
@@ -42,6 +44,15 @@ public class PropertySquare extends Square {
     }
 
     /**
+     * Gets the current rent for this property.
+     *
+     * @return the rent
+     */
+    public int getRent() {
+        return rents[0];
+    }
+
+    /**
      * Function for buying, paying rent or doing nothing
      *
      * @param player the player
@@ -55,8 +66,10 @@ public class PropertySquare extends Square {
                 transaction.settle();
             }
         }
-        else{
-            //TODO: pay rent
+        else if(owner != player){
+            Transaction transaction = new Transaction(player, owner, new Object[]{getRent()}, new Object[]{});
+            if(transaction.canSettle())
+                transaction.settle();
         }
     }
 }

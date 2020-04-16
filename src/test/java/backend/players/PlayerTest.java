@@ -70,21 +70,21 @@ class PlayerTest {
 
     @Test
     void containedMove() {
-        board.setSquares(new Square[]{new GoSquare("Go"), new PropertySquare("Prop", board.getBank()), new TaxSquare("Tax")});
+        board.setSquares(new Square[]{new GoSquare("Go"), new PropertySquare("Prop", board.getBank(), new int[]{1}), new TaxSquare("Tax")});
         player.move(2, true);
         assertEquals(2, player.getPosition());
     }
 
     @Test
     void overflowMove() {
-        board.setSquares(new Square[]{new GoSquare("Go"), new PropertySquare("Prop", board.getBank()), new TaxSquare("Tax")});
+        board.setSquares(new Square[]{new GoSquare("Go"), new PropertySquare("Prop", board.getBank(), new int[]{1}), new TaxSquare("Tax")});
         player.move(4, true);
         assertEquals(1, player.getPosition());
     }
 
     @Test
     void naturalMove() {
-        board.setSquares(new Square[]{new GoSquare("Go"), new PropertySquare("Prop", board.getBank()), new TaxSquare("Tax")});
+        board.setSquares(new Square[]{new GoSquare("Go"), new PropertySquare("Prop", board.getBank(), new int[]{1}), new TaxSquare("Tax")});
         for (int i = 0; i < 1000; i++) {
             board.getDice().roll();
             player.move(IntStream.of(board.getDice().getResult()).sum(), true);
@@ -94,7 +94,7 @@ class PlayerTest {
 
     @Test
     void collectsSalary() {
-        board.setSquares(new Square[]{new GoSquare("Go"), new PropertySquare("Prop", board.getBank()), new TaxSquare("Tax")});
+        board.setSquares(new Square[]{new GoSquare("Go"), new PropertySquare("Prop", board.getBank(), new int[]{1}), new TaxSquare("Tax")});
         player.setPosition(1);
         player.move(2, true);
         assertEquals(1700, player.getCash());
@@ -108,7 +108,7 @@ class PlayerTest {
 
     @Test
     void addProperty() {
-        PropertySquare prop = new PropertySquare("Prop", board.getBank());
+        PropertySquare prop = new PropertySquare("Prop", board.getBank(), new int[]{1});
         List<PropertySquare> props = new ArrayList<>();
         props.add(prop);
         player.addProperty(prop);
@@ -117,7 +117,7 @@ class PlayerTest {
 
     @Test
     void removeProperty() {
-        PropertySquare prop = new PropertySquare("Prop", board.getBank());
+        PropertySquare prop = new PropertySquare("Prop", board.getBank(), new int[]{1});
         List<PropertySquare> props = new ArrayList<>();
         props.add(prop);
         player.addProperty(prop);
