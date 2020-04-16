@@ -2,6 +2,7 @@ package backend.board;
 
 import backend.dice.Dice;
 import backend.party.Bank;
+import backend.party.FreeParking;
 import backend.players.Player;
 
 import java.util.List;
@@ -15,6 +16,7 @@ public class Board {
     private Square[] squares;
     private Dice dice;
     private Bank bank;
+    private FreeParking freeParking;
     private List<Player> players;
 
     /**
@@ -28,7 +30,12 @@ public class Board {
         this.squares = squares;
         this.dice = new Dice();
         this.bank = bank;
+        this.freeParking = new FreeParking(0);
         this.players = players;
+        for (Player player : players
+             ) {
+            player.setBoard(this);
+        }
     }
 
     /**
@@ -84,6 +91,13 @@ public class Board {
     public void setBank(Bank bank) {
         this.bank = bank;
     }
+
+    /**
+     * Gets free parking.
+     *
+     * @return the free parking
+     */
+    public FreeParking getFreeParking() { return freeParking; }
 
     public Player getPlayer(int index) { return players.get(index); }
 

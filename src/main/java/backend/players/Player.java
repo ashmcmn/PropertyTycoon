@@ -7,6 +7,8 @@ import backend.party.Party;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * The type Player.
@@ -19,7 +21,10 @@ public class Player implements Party {
     private int cash;
     private int position;
     private Board board;
+    private boolean canBuy;
     private List<PropertySquare> properties;
+    private boolean jailed;
+    private int goof;
 
     /**
      * Instantiates a new Player.
@@ -159,5 +164,20 @@ public class Player implements Party {
      */
     public void removeProperty(PropertySquare property) {
         this.properties.remove(property);
+    }
+
+    /**
+     * Send player to jail.
+     */
+    public void sendToJail() {
+        jailed = true;
+        setPosition(Stream.of(board.getSquares()).filter(s -> s.getName().equals("Jail/Just visiting")).collect(Collectors.toList()).get(0).getPosition() - 1);
+    }
+
+    /**
+     * Give a player a get out of jail free card
+     */
+    public void addGoof() {
+        goof++;
     }
 }
