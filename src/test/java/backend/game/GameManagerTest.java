@@ -28,7 +28,7 @@ class GameManagerTest {
                 new GoSquare("Go"),
                 new PropertySquare("Prop1", bank)
         }, new Bank(50000), new ArrayList<Player>());
-        gameManager = new GameManager(board);
+        gameManager = new GameManager(new String[]{"Jim", "Steve"});
     }
 
     @Test

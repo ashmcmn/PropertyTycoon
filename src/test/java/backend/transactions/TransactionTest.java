@@ -23,8 +23,8 @@ class TransactionTest {
     @BeforeEach
     void setUp() {
         Board board = new Board(new Square[]{}, new Bank(50000), new ArrayList<>());
-        p = new Player(Token.BOOT, 1500, board);
-        p2 = new Player(Token.CAT, 1500, board);
+        p = new Player("P1", Token.BOOT, 1500);
+        p2 = new Player("P2", Token.CAT, 1500);
     }
 
     @Test
