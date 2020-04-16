@@ -313,7 +313,13 @@ public class GameManager {
                 newSquare = new TaxSquare("Super Tax");
             }
             else if(ownable){
-                newSquare = new PropertySquare((String) importSquare.get("name"), this.getBoard().getBank());
+                JSONArray importRents = (JSONArray) importSquare.get("rent");
+                int[] rents = new int[importRents.size()];
+                for(int j = 0; j < rents.length; j++){
+                    rents[j] = ((Long) importRents.get(j)).intValue();
+                }
+
+                newSquare = new PropertySquare((String) importSquare.get("name"), this.getBoard().getBank(), rents);
             }
 
             squares[i] = newSquare;

@@ -26,7 +26,7 @@ class GameManagerTest {
         bank = new Bank(50000);
         board = new Board(new Square[]{
                 new GoSquare("Go"),
-                new PropertySquare("Prop1", bank)
+                new PropertySquare("Prop1", bank, new int[]{1})
         }, new Bank(50000), new ArrayList<Player>());
         gameManager = new GameManager(new String[]{"Jim", "Steve"});
     }
@@ -40,7 +40,7 @@ class GameManagerTest {
     void setBoard() {
         Board newBoard = new Board(new Square[]{
                 new GoSquare("Go"),
-                new PropertySquare("Prop2", bank)
+                new PropertySquare("Prop2", bank, new int[]{1})
         }, new Bank(50000), new ArrayList<Player>());
         gameManager.setBoard(newBoard);
         assertEquals(newBoard, gameManager.getBoard());
