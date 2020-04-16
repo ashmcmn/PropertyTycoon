@@ -86,7 +86,21 @@ public class GameManager {
             int[] result = dice.getResult();
 
             Square square = currentPlayer.move(IntStream.of(result).sum(), true);
-            //square.doAction(currentPlayer, board);
+            square.doAction(currentPlayer, board);
+
+            while(dice.wasDouble()) {
+                dice.roll();
+                result = dice.getResult();
+
+                if(dice.getDoubles() == 3){
+                    //go jail
+                    dice.resetDoubles();
+                    break;
+                }
+
+                square = currentPlayer.move(IntStream.of(result).sum(), true);
+                square.doAction(currentPlayer, board);
+            }
 
             if(players.indexOf(currentPlayer) == players.size()-1){
                 currentPlayer = players.get(0);
