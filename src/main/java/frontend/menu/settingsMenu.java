@@ -1,4 +1,4 @@
-package main.frontend.menu;
+package frontend.menu;
 
 import javafx.application.Application;
 import javafx.event.ActionEvent;

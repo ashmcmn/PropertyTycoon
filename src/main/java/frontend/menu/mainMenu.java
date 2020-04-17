@@ -1,4 +1,4 @@
-package main.frontend.menu;
+package frontend.menu;
 
 import javafx.application.Application;
 import javafx.scene.Scene;
@@ -10,13 +10,8 @@ import javafx.scene.layout.*;
 import javafx.stage.Stage;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
-import javafx.scene.canvas.*;
-import javafx.scene.web.*;
-import javafx.scene.layout.*;
 import javafx.scene.image.*;
 
-import java.awt.*;
-import java.awt.event.MouseEvent;
 import java.io.*;
 import javafx.geometry.*;
 import javafx.scene.Group;
