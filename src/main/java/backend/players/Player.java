@@ -1,12 +1,16 @@
 package backend.players;
 
 import backend.board.Board;
+import backend.board.Group;
 import backend.board.PropertySquare;
 import backend.board.Square;
 import backend.party.Party;
+import backend.transactions.Transaction;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * The type Player.
@@ -19,7 +23,10 @@ public class Player implements Party {
     private int cash;
     private int position;
     private Board board;
+    private boolean canBuy;
     private List<PropertySquare> properties;
+    private boolean jailed;
+    private int goof;
 
     /**
      * Instantiates a new Player.
@@ -50,15 +57,6 @@ public class Player implements Party {
      */
     public Token getToken() {
         return token;
-    }
-
-    /**
-     * Sets token.
-     *
-     * @param token The token to give to the player
-     */
-    public void setToken(Token token) {
-        this.token = token;
     }
 
     /**
@@ -125,7 +123,7 @@ public class Player implements Party {
     public Square move(int amount, boolean collectSalary) {
         int newPosition = (getPosition() + amount) % board.getSquares().length;
 
-        if(newPosition < getPosition() && collectSalary){
+        if(newPosition <= getPosition() && collectSalary){
             setCash(getCash() + 200);
         }
 
@@ -159,5 +157,68 @@ public class Player implements Party {
      */
     public void removeProperty(PropertySquare property) {
         this.properties.remove(property);
+    }
+
+    /**
+     * Send player to jail.
+     */
+    public void sendToJail() {
+        jailed = true;
+        setPosition(Stream.of(board.getSquares()).filter(s -> s.getName().equals("Jail/Just visiting")).collect(Collectors.toList()).get(0).getPosition() - 1);
+    }
+
+    /**
+     * Give a player a get out of jail free card
+     */
+    public void addGoof() {
+        goof++;
+    }
+
+    public boolean ownsGroup(Group group){
+        return getProperties().containsAll(Stream.of(board.getSquares())
+                .filter(PropertySquare.class::isInstance)
+                .map(PropertySquare.class::cast)
+                .filter(s -> s.getGroup() == group)
+                .collect(Collectors.toList()));
+    }
+
+    public boolean improve(PropertySquare prop){
+        int type = 0;
+        if(prop.getLevel() == 4)
+            type = 1;
+
+        if(ownsGroup(prop.getGroup())){
+            Transaction transaction = new Transaction(this, board.getBank(), new Object[]{board.getImprovementCost(prop.getGroup(), type)}, new Object[]{});
+            if(transaction.canSettle()){
+                if(prop.addLevel())
+                    transaction.settle();
+                else return false;
+            }
+            else{
+                return false;
+            }
+
+        }
+        else{
+            return false;
+        }
+        return true;
+    }
+
+    public boolean devalue(PropertySquare prop){
+        int type = 0;
+        if(prop.getLevel() == 5)
+            type = 1;
+
+        if(ownsGroup(prop.getGroup())){
+            Transaction transaction = new Transaction(board.getBank(), this, new Object[]{board.getImprovementCost(prop.getGroup(), type)}, new Object[]{});
+            if(prop.removeLevel())
+                transaction.settle();
+            else return false;
+        }
+        else{
+            return false;
+        }
+        return true;
     }
 }
