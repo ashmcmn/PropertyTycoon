@@ -318,13 +318,90 @@ public class GameManager {
                 for(int j = 0; j < rents.length; j++){
                     rents[j] = ((Long) importRents.get(j)).intValue();
                 }
+                Group group;
 
-                newSquare = new PropertySquare((String) importSquare.get("name"), this.getBoard().getBank(), rents);
+                switch ((String) importSquare.get("group")){
+                    case "Brown":
+                        group = Group.BROWN;
+                        break;
+                    case "Blue":
+                        group = Group.BLUE;
+                        break;
+                    case "Purple":
+                        group = Group.PURPLE;
+                        break;
+                    case "Orange":
+                        group = Group.ORANGE;
+                        break;
+                    case "Red":
+                        group = Group.RED;
+                        break;
+                    case "Yellow":
+                        group = Group.YELLOW;
+                        break;
+                    case "Green":
+                        group = Group.GREEN;
+                        break;
+                    case "Deep blue":
+                        group = Group.DEEPBLUE;
+                        break;
+                    case "Station":
+                        group = Group.STATION;
+                        break;
+                    case "Utilities":
+                        group = Group.UTILITIES;
+                        break;
+                    default:
+                        throw new IllegalStateException("Unexpected value: " + (String) ((JSONObject) importSquare).get("group"));
+                }
+                newSquare = new PropertySquare((String) importSquare.get("name"), this.getBoard().getBank(), rents, group, this.board);
             }
 
             squares[i] = newSquare;
         }
 
+        JSONArray importImprovementCosts = (JSONArray) board.get("propertyCosts");
+        Map<Group,int[]> improvementCosts = new HashMap<>();
+
+        for(Object o : importImprovementCosts) {
+            Group group;
+            switch ((String) ((JSONObject) o).get("group")){
+                case "Brown":
+                    group = Group.BROWN;
+                    break;
+                case "Blue":
+                    group = Group.BLUE;
+                    break;
+                case "Purple":
+                    group = Group.PURPLE;
+                    break;
+                case "Orange":
+                    group = Group.ORANGE;
+                    break;
+                case "Red":
+                    group = Group.RED;
+                    break;
+                case "Yellow":
+                    group = Group.YELLOW;
+                    break;
+                case "Green":
+                    group = Group.GREEN;
+                    break;
+                case "Deep blue":
+                    group = Group.DEEPBLUE;
+                    break;
+                default:
+                    throw new IllegalStateException("Unexpected value: " + (String) ((JSONObject) o).get("group"));
+            }
+
+            int[] costs = new int[2];
+            costs[0] = ((Long) ((JSONArray) ((JSONObject) o).get("costs")).get(0)).intValue();
+            costs[1] = ((Long) ((JSONArray) ((JSONObject) o).get("costs")).get(1)).intValue();
+
+            improvementCosts.put(group, costs);
+        }
+
+        this.getBoard().setImprovementCosts(improvementCosts);
         this.getBoard().setSquares(squares);
 
 

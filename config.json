@@ -299,16 +299,40 @@
       }
     ],
     "propertyCosts":
-    {
-      "Brown": [50, 50],
-      "Blue": [50, 50],
-      "Purple": [100, 100],
-      "Orange": [100, 100],
-      "Red": [150, 150],
-      "Yellow": [150, 150],
-      "Green": [200, 200],
-      "Deep blue": [200, 200]
-    },
+    [
+      {
+        "group": "Brown",
+        "costs": [50, 50]
+      },
+      {
+        "group": "Blue",
+        "costs": [50, 50]
+      },
+      {
+        "group": "Purple",
+        "costs": [100, 100]
+      },
+      {
+        "group": "Orange",
+        "costs": [100, 100]
+      },
+      {
+        "group": "Red",
+        "costs": [150, 150]
+      },
+      {
+        "group": "Yellow",
+        "costs": [150, 150]
+      },
+      {
+        "group": "Green",
+        "costs": [200, 200]
+      },
+      {
+        "group": "Deep blue",
+        "costs": [200, 200]
+      }
+    ],
     "cardPiles":
     [
       {

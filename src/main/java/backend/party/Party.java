@@ -1,5 +1,6 @@
 package backend.party;
 
+import backend.board.Group;
 import backend.board.PropertySquare;
 
 import java.util.List;
@@ -45,4 +46,12 @@ public interface Party {
      * @param property the property
      */
     void removeProperty(PropertySquare property);
+
+    /**
+     * Checks if a player owns a full group
+     *
+     * @param group the group
+     * @return the boolean
+     */
+    boolean ownsGroup(Group group);
 }

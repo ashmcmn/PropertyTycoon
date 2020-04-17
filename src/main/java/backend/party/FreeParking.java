@@ -1,5 +1,6 @@
 package backend.party;
 
+import backend.board.Group;
 import backend.board.PropertySquare;
 
 import java.util.List;
@@ -47,5 +48,10 @@ public class FreeParking implements Party{
     }
 
     public void removeProperty(PropertySquare property) {
+    }
+
+    @Override
+    public boolean ownsGroup(Group group) {
+        return false;
     }
 }

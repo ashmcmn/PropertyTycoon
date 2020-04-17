@@ -1,6 +1,7 @@
 package backend.transactions;
 
 import backend.board.Board;
+import backend.board.Group;
 import backend.board.PropertySquare;
 import backend.board.Square;
 import backend.party.Bank;
@@ -16,13 +17,14 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.*;
 
 class TransactionTest {
+    Board board;
     Transaction transaction;
     Player p;
     Player p2;
 
     @BeforeEach
     void setUp() {
-        Board board = new Board(new Square[]{}, new Bank(50000), new ArrayList<>());
+        board = new Board(new Square[]{}, new Bank(50000), new ArrayList<>());
         p = new Player("P1", Token.BOOT, 1500);
         p2 = new Player("P2", Token.CAT, 1500);
     }
@@ -41,7 +43,7 @@ class TransactionTest {
 
     @Test
     void settleProperty() {
-        PropertySquare prop = new PropertySquare("Prop", p, new int[]{1});
+        PropertySquare prop = new PropertySquare("Prop", p, new int[]{1}, Group.GREEN, board);
         p.addProperty(prop);
 
         transaction = new Transaction(p, p2, new Object[]{prop}, new Object[]{});
@@ -55,7 +57,7 @@ class TransactionTest {
 
     @Test
     void settleMixed() {
-        PropertySquare prop = new PropertySquare("Prop", p, new int[]{1});
+        PropertySquare prop = new PropertySquare("Prop", p, new int[]{1}, Group.GREEN, board);
         p.addProperty(prop);
 
         transaction = new Transaction(p, p2, new Object[]{prop}, new Object[]{200});

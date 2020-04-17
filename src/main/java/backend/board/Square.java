@@ -10,6 +10,7 @@ import backend.players.Player;
 public abstract class Square {
     private String name;
     private int position;
+    protected Board board;
 
     /**
      * Instantiates a new Square.
