@@ -2,9 +2,11 @@ package backend.board;
 
 import backend.dice.Dice;
 import backend.party.Bank;
+import backend.party.FreeParking;
 import backend.players.Player;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * The type Board.
@@ -15,7 +17,9 @@ public class Board {
     private Square[] squares;
     private Dice dice;
     private Bank bank;
+    private FreeParking freeParking;
     private List<Player> players;
+    private Map<Group,int[]> improvementCosts;
 
     /**
      * Instantiates a new Board.
@@ -28,7 +32,13 @@ public class Board {
         this.squares = squares;
         this.dice = new Dice();
         this.bank = bank;
+        this.freeParking = new FreeParking(0);
         this.players = players;
+
+        for (Player player : players
+             ) {
+            player.setBoard(this);
+        }
     }
 
     /**
@@ -85,9 +95,52 @@ public class Board {
         this.bank = bank;
     }
 
+    /**
+     * Gets free parking.
+     *
+     * @return the free parking
+     */
+    public FreeParking getFreeParking() { return freeParking; }
+
+    /**
+     * Gets player.
+     *
+     * @param index the index
+     * @return the player
+     */
     public Player getPlayer(int index) { return players.get(index); }
 
+    /**
+     * Add player.
+     *
+     * @param player the player
+     */
     public void addPlayer(Player player) { players.add(player); }
 
+    /**
+     * Remove player.
+     *
+     * @param player the player
+     */
     public void removePlayer(Player player) { players.remove(player); }
+
+    /**
+     * Sets improvement costs.
+     *
+     * @param improvementCosts the improvement costs
+     */
+    public void setImprovementCosts(Map<Group, int[]> improvementCosts) {
+        this.improvementCosts = improvementCosts;
+    }
+
+    /**
+     * Get improvement cost for a given group and property type.
+     *
+     * @param group the group
+     * @param type  the type
+     * @return the cost
+     */
+    public int getImprovementCost(Group group, int type){
+        return improvementCosts.get(group)[type];
+    }
 }

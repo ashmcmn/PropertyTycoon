@@ -1,10 +1,15 @@
 package backend.game;
 
 import backend.board.*;
+import backend.cards.Action;
+import backend.cards.Card;
+import backend.cards.CardPile;
 import backend.dice.Dice;
 import backend.party.Bank;
+import backend.party.Party;
 import backend.players.Player;
 import backend.players.Token;
+import backend.transactions.Transaction;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -76,6 +81,15 @@ public class GameManager {
     }
 
     /**
+     * Sets the current player.
+     *
+     * @return the current player
+     */
+    public void setCurrentPlayer(Player currentPlayer) {
+        this.currentPlayer = currentPlayer;
+    }
+
+    /**
      * Starts the game.
      */
     public void startGame(){
@@ -86,7 +100,21 @@ public class GameManager {
             int[] result = dice.getResult();
 
             Square square = currentPlayer.move(IntStream.of(result).sum(), true);
-            //square.doAction(currentPlayer, board);
+            square.doAction(currentPlayer, board);
+
+            while(dice.wasDouble()) {
+                dice.roll();
+                result = dice.getResult();
+
+                if(dice.getDoubles() == 3){
+                    //go jail
+                    dice.resetDoubles();
+                    break;
+                }
+
+                square = currentPlayer.move(IntStream.of(result).sum(), true);
+                square.doAction(currentPlayer, board);
+            }
 
             if(players.indexOf(currentPlayer) == players.size()-1){
                 currentPlayer = players.get(0);
@@ -116,6 +144,142 @@ public class GameManager {
 
         JSONObject board = (JSONObject) jsonObject.get("board");
 
+        JSONArray importCardPiles = (JSONArray) board.get("cardPiles");
+        Map<String, CardPile> cardPiles = new HashMap<>();
+
+        for(Object pile : importCardPiles) {
+            List<Card> cards = new ArrayList<>();
+            JSONArray importCards  = (JSONArray) ((JSONObject) pile).get("cards");
+
+            for(Object importCard : importCards) {
+                JSONObject jsonCard = (JSONObject) importCard;
+                Card card = null;
+                if(jsonCard.get("actiontype").equals("Pay")){
+                    if(jsonCard.get("from").equals("All")){
+                        //TODO: collect cash from all players
+                        break;
+                    }
+
+                    Party from;
+                    Party to;
+                    switch(((String) jsonCard.get("from"))){
+                        case "Bank":
+                            from = this.board.getBank();
+                            break;
+                        case "Player":
+                            from = this.currentPlayer;
+                            break;
+                        default:
+                            throw new IllegalStateException("Unexpected value: " + ((String) jsonCard.get("from")));
+                    }
+
+                    switch(((String) jsonCard.get("to"))){
+                        case "Bank":
+                            to = this.board.getBank();
+                            break;
+                        case "Player":
+                            to = this.currentPlayer;
+                            break;
+                        case "FreeParking":
+                            to = this.board.getFreeParking();
+                            break;
+                        default:
+                            throw new IllegalStateException("Unexpected value: " + ((String) jsonCard.get("to")));
+                    }
+
+                    card = new Card((String) jsonCard.get("description"), new Action() {
+                        public void action() {
+                            Transaction transaction = new Transaction(from, to, new Object[]{((Long) jsonCard.get("amount")).intValue()}, new Object[]{});
+                            if(transaction.canSettle())
+                                transaction.settle();
+                        }
+                    });
+                }
+                else if(jsonCard.get("actiontype").equals("Move")){
+                    int where = ((Long) jsonCard.get("where")).intValue();
+                    boolean collect = (boolean) jsonCard.get("collect");
+
+                    card = new Card((String) jsonCard.get("description"), new Action() {
+                        public void action() {
+                            currentPlayer.move(where - currentPlayer.getPosition(), collect);
+                        }
+                    });
+                }
+                else if(jsonCard.get("actiontype").equals("PayDraw")){
+
+                        String newPile = (String) jsonCard.get("pile");
+
+                        Party from;
+                        Party to;
+                        switch(((String) jsonCard.get("from"))){
+                            case "Bank":
+                                from = this.board.getBank();
+                                break;
+                            case "Player":
+                                from = this.currentPlayer;
+                                break;
+                            default:
+                                throw new IllegalStateException("Unexpected value: " + ((String) jsonCard.get("from")));
+                        }
+
+                        switch(((String) jsonCard.get("to"))){
+                            case "Bank":
+                                to = this.board.getBank();
+                                break;
+                            case "Player":
+                                to = this.currentPlayer;
+                                break;
+                            case "FreeParking":
+                                to = this.board.getFreeParking();
+                                break;
+                            default:
+                                throw new IllegalStateException("Unexpected value: " + ((String) jsonCard.get("to")));
+                        }
+
+                        card = new Card((String) jsonCard.get("description"), new Action() {
+                            public void action() {
+                                Random rand = new Random();
+                                if(rand.nextInt(2) == 0) {
+                                    Transaction transaction = new Transaction(from, to, new Object[]{((Long) jsonCard.get("amount")).intValue()}, new Object[]{});
+                                    if (transaction.canSettle())
+                                        transaction.settle();
+                                }
+                                else {
+                                    Card newCard = cardPiles.get(newPile).draw();
+                                    if(newCard.getDescription().equals("Get out of jail free")){
+                                        currentPlayer.addGoof();
+                                    }
+                                    else{
+                                        newCard.doAction();
+                                        cardPiles.get(newPile).addCard(newCard);
+                                    }
+                                }
+                            }
+                        });
+                }
+                else if(jsonCard.get("actiontype").equals("GoJail")){
+                    card = new Card((String) jsonCard.get("description"), new Action() {
+                        public void action() {
+                            currentPlayer.sendToJail();
+                        }
+                    });
+                }
+                else if(jsonCard.get("actiontype").equals("PayRes")){
+                    card = new Card((String) jsonCard.get("description"), new Action() {
+                        public void action() {
+                            int total = 0;
+                            //TODO: add once improvements are implemented
+                        }
+                    });
+                }
+
+                cards.add(card);
+            }
+
+            cardPiles.put((String) ((JSONObject) pile).get("name"), new CardPile(cards));
+        }
+
+
         JSONArray importSquares = (JSONArray) board.get("squares");
 
         Square[] squares = new Square[importSquares.size()];
@@ -129,14 +293,12 @@ public class GameManager {
             if(importSquare.get("name").equals("Go")){
                 newSquare = new GoSquare("Go");
             }
-            else if(importSquare.get("name").equals("Pot Luck")){
-                newSquare = new CardDrawSquare("Pot Luck");
+            else if(importSquare.get("action") != null && importSquare.get("action").equals("Take card")){
+                CardPile cardPile = cardPiles.get(importSquare.get("name"));
+                newSquare = new CardDrawSquare((String) importSquare.get("name"), cardPile);
             }
             else if(importSquare.get("name").equals("Income Tax")){
                 newSquare = new TaxSquare("Income Tax");
-            }
-            else if(importSquare.get("name").equals("Opportunity Costs")){
-                newSquare = new CardDrawSquare("Opportunity Costs");
             }
             else if(importSquare.get("name").equals("Jail/Just visiting")){
                 newSquare = new JailSquare("Jail/Just visiting");
@@ -151,12 +313,95 @@ public class GameManager {
                 newSquare = new TaxSquare("Super Tax");
             }
             else if(ownable){
-                newSquare = new PropertySquare((String) importSquare.get("name"), this.getBoard().getBank());
+                JSONArray importRents = (JSONArray) importSquare.get("rent");
+                int[] rents = new int[importRents.size()];
+                for(int j = 0; j < rents.length; j++){
+                    rents[j] = ((Long) importRents.get(j)).intValue();
+                }
+                Group group;
+
+                switch ((String) importSquare.get("group")){
+                    case "Brown":
+                        group = Group.BROWN;
+                        break;
+                    case "Blue":
+                        group = Group.BLUE;
+                        break;
+                    case "Purple":
+                        group = Group.PURPLE;
+                        break;
+                    case "Orange":
+                        group = Group.ORANGE;
+                        break;
+                    case "Red":
+                        group = Group.RED;
+                        break;
+                    case "Yellow":
+                        group = Group.YELLOW;
+                        break;
+                    case "Green":
+                        group = Group.GREEN;
+                        break;
+                    case "Deep blue":
+                        group = Group.DEEPBLUE;
+                        break;
+                    case "Station":
+                        group = Group.STATION;
+                        break;
+                    case "Utilities":
+                        group = Group.UTILITIES;
+                        break;
+                    default:
+                        throw new IllegalStateException("Unexpected value: " + (String) ((JSONObject) importSquare).get("group"));
+                }
+                newSquare = new PropertySquare((String) importSquare.get("name"), this.getBoard().getBank(), rents, group, this.board);
             }
 
             squares[i] = newSquare;
         }
 
+        JSONArray importImprovementCosts = (JSONArray) board.get("propertyCosts");
+        Map<Group,int[]> improvementCosts = new HashMap<>();
+
+        for(Object o : importImprovementCosts) {
+            Group group;
+            switch ((String) ((JSONObject) o).get("group")){
+                case "Brown":
+                    group = Group.BROWN;
+                    break;
+                case "Blue":
+                    group = Group.BLUE;
+                    break;
+                case "Purple":
+                    group = Group.PURPLE;
+                    break;
+                case "Orange":
+                    group = Group.ORANGE;
+                    break;
+                case "Red":
+                    group = Group.RED;
+                    break;
+                case "Yellow":
+                    group = Group.YELLOW;
+                    break;
+                case "Green":
+                    group = Group.GREEN;
+                    break;
+                case "Deep blue":
+                    group = Group.DEEPBLUE;
+                    break;
+                default:
+                    throw new IllegalStateException("Unexpected value: " + (String) ((JSONObject) o).get("group"));
+            }
+
+            int[] costs = new int[2];
+            costs[0] = ((Long) ((JSONArray) ((JSONObject) o).get("costs")).get(0)).intValue();
+            costs[1] = ((Long) ((JSONArray) ((JSONObject) o).get("costs")).get(1)).intValue();
+
+            improvementCosts.put(group, costs);
+        }
+
+        this.getBoard().setImprovementCosts(improvementCosts);
         this.getBoard().setSquares(squares);
 
 

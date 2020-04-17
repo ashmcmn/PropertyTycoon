@@ -1,5 +1,6 @@
 package backend.party;
 
+import backend.board.Group;
 import backend.board.PropertySquare;
 
 import java.util.ArrayList;
@@ -67,5 +68,10 @@ public class Bank implements Party{
      */
     public void removeProperty(PropertySquare property) {
         this.properties.remove(property);
+    }
+
+    @Override
+    public boolean ownsGroup(Group group) {
+        return false;
     }
 }
