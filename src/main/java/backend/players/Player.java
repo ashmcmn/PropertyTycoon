@@ -26,12 +26,13 @@ public class Player implements Party {
     private boolean canBuy;
     private List<PropertySquare> properties;
     private boolean jailed;
+    private int jailedTurns = 0;
     private int goof;
 
     /**
      * Instantiates a new Player.
      *
-     * @param name the player's name
+     * @param name  the player's name
      * @param token the token to represent the player's position on the board
      * @param cash  the amount of cash currently held by the player
      */
@@ -182,6 +183,12 @@ public class Player implements Party {
                 .collect(Collectors.toList()));
     }
 
+    /**
+     * Improve a given property.
+     *
+     * @param prop the property
+     * @return whether it was successful
+     */
     public boolean improve(PropertySquare prop){
         int type = 0;
         if(prop.getLevel() == 4)
@@ -205,6 +212,12 @@ public class Player implements Party {
         return true;
     }
 
+    /**
+     * Devalue a given property.
+     *
+     * @param prop the property
+     * @return whether it was successful
+     */
     public boolean devalue(PropertySquare prop){
         int type = 0;
         if(prop.getLevel() == 5)
@@ -220,5 +233,34 @@ public class Player implements Party {
             return false;
         }
         return true;
+    }
+
+    /**
+     * Checks if player is jailed
+     *
+     * @return the boolean
+     */
+    public boolean isJailed() {
+        return jailed;
+    }
+
+    /**
+     * Add a turn in jail
+     */
+    public void addJailedTurn() { jailedTurns++; }
+
+    /**
+     * Gets turns in jail
+     *
+     * @return the jailed turns
+     */
+    public int getJailedTurns() { return jailedTurns; }
+
+    /**
+     * Release from jail.
+     */
+    public void releaseFromJail() {
+        jailed = false;
+        jailedTurns = 0;
     }
 }

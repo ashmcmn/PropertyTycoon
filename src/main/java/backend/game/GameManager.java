@@ -18,7 +18,9 @@ import org.json.simple.parser.ParseException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.*;
+import java.util.stream.Collectors;
 import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
 /**
  * The type Game manager.
@@ -89,6 +91,12 @@ public class GameManager {
         this.currentPlayer = currentPlayer;
     }
 
+    public static void main(String[] args){
+        GameManager gameManager = new GameManager(new String[]{"P1", "P2"});
+        gameManager.loadConfig("config.json");
+        gameManager.startGame();
+    }
+
     /**
      * Starts the game.
      */
@@ -96,6 +104,22 @@ public class GameManager {
         currentPlayer = board.getPlayer(0);
 
         while (!ended){
+            if(currentPlayer.isJailed()){
+                currentPlayer.addJailedTurn();
+                if(currentPlayer.getJailedTurns() == 3){
+                    Transaction transaction = new Transaction(currentPlayer, board.getBank(), new Object[]{50}, new Object[]{});
+                    if(transaction.canSettle())
+                        transaction.settle();
+                }
+                if(players.indexOf(currentPlayer) == players.size()-1){
+                    currentPlayer = players.get(0);
+                }
+                else{
+                    currentPlayer = players.get(players.indexOf(currentPlayer) + 1);
+                }
+                continue;
+            }
+
             dice.roll();
             int[] result = dice.getResult();
 
@@ -107,7 +131,7 @@ public class GameManager {
                 result = dice.getResult();
 
                 if(dice.getDoubles() == 3){
-                    //go jail
+                    currentPlayer.sendToJail();
                     dice.resetDoubles();
                     break;
                 }
