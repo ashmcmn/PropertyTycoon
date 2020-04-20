@@ -1,6 +1,7 @@
 package backend.board;
 
 import backend.players.Player;
+import backend.transactions.Transaction;
 
 /**
  * The type Free parking square.
@@ -23,6 +24,7 @@ public class FreeParkingSquare extends Square {
      */
     @Override
     public void doAction(Player player, Board board) {
-        //TODO
+        Transaction transaction = new Transaction(board.getFreeParking(), player, new Object[]{board.getFreeParking().getCash()}, new Object[]{});
+        transaction.settle();
     }
 }
