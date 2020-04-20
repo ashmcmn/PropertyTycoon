@@ -100,7 +100,6 @@ public class GameManager {
 
     public static void main(String[] args){
         GameManager gameManager = new GameManager(new String[]{"P1", "P2"});
-        gameManager.loadConfig("config.json");
         gameManager.startGame();
     }
 
@@ -111,7 +110,7 @@ public class GameManager {
         LOG.debug("Starting the game");
         currentPlayer = board.getPlayer(0);
 
-        while (!ended && turn < 50){
+        while (!ended && turn < 1000){
             LOG.debug(currentPlayer.getName() + " is taking their turn, " + turn);
             if(currentPlayer.isJailed()){
                 LOG.debug(currentPlayer.getName() + " is in jail");
@@ -120,6 +119,7 @@ public class GameManager {
                     Transaction transaction = new Transaction(currentPlayer, board.getBank(), new Object[]{50}, new Object[]{});
                     if(currentPlayer.getJailedTurns() == 3 && transaction.canSettle()){
                         transaction.settle();
+                        currentPlayer.releaseFromJail();
                         LOG.debug(currentPlayer.getName() + " paid out of jail");
                     }
                     else{
@@ -144,6 +144,7 @@ public class GameManager {
             square.doAction(currentPlayer, board);
 
             while(dice.wasDouble()) {
+                LOG.debug("A double was rolled so " + currentPlayer.getName() + " takes another turn");
                 dice.roll();
                 result = dice.getResult();
 

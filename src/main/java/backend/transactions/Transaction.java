@@ -41,6 +41,7 @@ public class Transaction {
     public boolean canSettle() {
         for (Object item : oneToTwo) {
             if(item instanceof Integer && partyOne.getCash() < (Integer) item){
+                LOG.debug(partyOne.getName() + " can't afford to give " + partyTwo.getName() + " £" + item);
                 return false;
             }
             else if(item instanceof PropertySquare && !partyOne.getProperties().contains(item)){
@@ -49,6 +50,7 @@ public class Transaction {
         }
         for (Object item : twoToOne) {
             if(item instanceof Integer && partyTwo.getCash() < (Integer) item){
+                LOG.debug(partyTwo.getName() + " can't afford to give " + partyOne.getName() + " £" + item);
                 return false;
             }
             else if(item instanceof PropertySquare && !partyTwo.getProperties().contains(item)){
