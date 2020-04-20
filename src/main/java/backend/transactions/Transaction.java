@@ -1,7 +1,10 @@
 package backend.transactions;
 
 import backend.board.PropertySquare;
+import backend.game.GameManager;
 import backend.party.Party;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 /**
  * The type Transaction.
@@ -13,6 +16,7 @@ public class Transaction {
     private Party partyTwo;
     private Object[] oneToTwo;
     private Object[] twoToOne;
+    protected static final Logger LOG = LogManager.getLogger(Transaction.class);
 
     /**
      * Instantiates a new Transaction.
@@ -60,10 +64,12 @@ public class Transaction {
     public void settle() {
         for (Object item : oneToTwo) {
             if(item instanceof Integer){
+                LOG.debug(partyOne.getName() + " has paid " + partyTwo.getName() + " £" + item);
                 partyOne.setCash(partyOne.getCash() - ((Integer) item));
                 partyTwo.setCash(partyTwo.getCash() + ((Integer) item));
             }
             else if(item instanceof PropertySquare){
+                LOG.debug(partyOne.getName() + " has given " + partyTwo.getName() + " " + ((PropertySquare) item).getName());
                 partyOne.removeProperty((PropertySquare) item);
                 partyTwo.addProperty((PropertySquare) item);
                 ((PropertySquare) item).setOwner(partyTwo);
@@ -72,10 +78,12 @@ public class Transaction {
 
         for (Object item : twoToOne) {
             if(item instanceof Integer){
+                LOG.debug(partyTwo.getName() + " has paid " + partyOne.getName() + " £" + item);
                 partyTwo.setCash(partyTwo.getCash() - ((Integer) item));
                 partyOne.setCash(partyOne.getCash() + ((Integer) item));
             }
             else if(item instanceof PropertySquare){
+                LOG.debug(partyTwo.getName() + " has given " + partyOne.getName()+ " " + ((PropertySquare) item).getName());
                 partyTwo.removeProperty((PropertySquare) item);
                 partyOne.addProperty((PropertySquare) item);
                 ((PropertySquare) item).setOwner(partyOne);

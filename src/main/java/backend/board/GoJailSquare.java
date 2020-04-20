@@ -30,6 +30,7 @@ public class GoJailSquare extends Square {
      */
     @Override
     public void doAction(Player player, Board board) {
+        LOG.debug("Sending " + player.getName() + " to jail");
         int index = IntStream.range(0, board.getSquares().length)
                 .filter(i -> List.of(board.getSquares()).get(i).getName().equals("Go to jail"))
                 .findFirst()

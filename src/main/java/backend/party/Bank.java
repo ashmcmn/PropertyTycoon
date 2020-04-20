@@ -43,6 +43,8 @@ public class Bank implements Party{
         this.cash = cash;
     }
 
+    public String getName() { return "the bank"; }
+
     /**
      * Gets properties owned by the player
      *

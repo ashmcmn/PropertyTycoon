@@ -1,6 +1,7 @@
 package backend.board;
 
 import backend.players.Player;
+import backend.transactions.Transaction;
 
 /**
  * The type Tax square.
@@ -8,13 +9,16 @@ import backend.players.Player;
  * @author Ashley McManamon
  */
 public class TaxSquare extends Square {
+    private int amount;
+
     /**
      * Instantiates a new Square.
      *
      * @param name the name of the square
      */
-    public TaxSquare(String name) {
+    public TaxSquare(String name, int amount) {
         super(name);
+        this.amount = amount;
     }
 
     /**
@@ -25,6 +29,8 @@ public class TaxSquare extends Square {
      */
     @Override
     public void doAction(Player player, Board board) {
-        //TODO
+        Transaction transaction = new Transaction(player, board.getBank(), new Object[]{amount}, new Object[]{});
+        if(transaction.canSettle())
+            transaction.settle();
     }
 }

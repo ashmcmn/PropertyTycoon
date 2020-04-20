@@ -1,6 +1,9 @@
 package backend.board;
 
+import backend.game.GameManager;
 import backend.players.Player;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 /**
  * The type Square.
@@ -11,6 +14,7 @@ public abstract class Square {
     private String name;
     private int position;
     protected Board board;
+    protected static final Logger LOG = LogManager.getLogger(Square.class);
 
     /**
      * Instantiates a new Square.
@@ -53,4 +57,13 @@ public abstract class Square {
      * @param board  the board
      */
     public abstract void doAction(Player player, Board board);
+
+    /**
+     * Sets position of the square.
+     *
+     * @param position the position
+     */
+    public void setPosition(int position) {
+        this.position = position;
+    }
 }

@@ -228,7 +228,6 @@
       {
         "position": 31,
         "name": "Go to Jail",
-        "group": "Go to jail",
         "ownable": "No"
       },
       {
@@ -272,7 +271,7 @@
       {
         "position": 37,
         "name": "Opportunity Knocks",
-        "group": "Take card",
+        "action": "Take card",
         "ownable": "No"
       },
       {
@@ -339,7 +338,7 @@
         "name": "Opportunity Knocks",
         "cards": [
           {
-            "description": "Bank pays you divided of £50",
+            "description": "Bank pays you dividend of £50",
             "actiontype": "Pay",
             "amount": 50,
             "from": "Bank",

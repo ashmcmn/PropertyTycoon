@@ -24,6 +24,7 @@ public class FreeParkingSquare extends Square {
      */
     @Override
     public void doAction(Player player, Board board) {
+        LOG.debug("Giving " + player.getName() + " accumulated fines of " + board.getFreeParking().getCash());
         Transaction transaction = new Transaction(board.getFreeParking(), player, new Object[]{board.getFreeParking().getCash()}, new Object[]{});
         transaction.settle();
     }

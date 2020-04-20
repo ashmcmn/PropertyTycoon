@@ -25,6 +25,8 @@ public interface Party {
      */
     void setCash(int cash);
 
+    String getName();
+
     /**
      * Gets properties.
      *
