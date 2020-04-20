@@ -18,6 +18,7 @@ public class PropertySquare extends Square {
     private int level;
     private Group group;
     private int cost;
+    private boolean mortgaged = false;
 
     /**
      * Instantiates a new Square.
@@ -89,7 +90,7 @@ public class PropertySquare extends Square {
                 transaction.settle();
             }
         }
-        else if(owner != player){
+        else if(owner != player && !mortgaged){
             LOG.debug(player.getName() + " pays " + getOwner() + " £" + getRent() + " in rent");
             Transaction transaction = new Transaction(player, owner, new Object[]{getRent()}, new Object[]{});
             if(transaction.canSettle())
@@ -169,4 +170,23 @@ public class PropertySquare extends Square {
      * @return the cost
      */
     public int getCost() { return cost; }
+
+    /**
+     * Mortgage.
+     */
+    public void mortgage() {
+        Transaction transaction = new Transaction(board.getBank(), owner, new Object[]{cost/2}, new Object[]{});
+        transaction.settle();
+        mortgaged = true;
+    }
+
+    /**
+     * Payoff mortgage.
+     */
+    public void payoff() {
+        Transaction transaction = new Transaction(owner, board.getBank(), new Object[]{cost/2}, new Object[]{});
+        if(transaction.canSettle()){
+            mortgaged = false;
+        }
+    }
 }
