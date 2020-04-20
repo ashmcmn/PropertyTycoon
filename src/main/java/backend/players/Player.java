@@ -263,4 +263,13 @@ public class Player implements Party {
         jailed = false;
         jailedTurns = 0;
     }
+
+    public boolean useGoof() {
+        if(goof > 0){
+            goof--;
+            releaseFromJail();
+            return true;
+        }
+        return false;
+    }
 }

@@ -106,18 +106,21 @@ public class GameManager {
         while (!ended){
             if(currentPlayer.isJailed()){
                 currentPlayer.addJailedTurn();
-                if(currentPlayer.getJailedTurns() == 3){
+                if(!currentPlayer.useGoof()){
                     Transaction transaction = new Transaction(currentPlayer, board.getBank(), new Object[]{50}, new Object[]{});
-                    if(transaction.canSettle())
+                    if(currentPlayer.getJailedTurns() == 3 && transaction.canSettle()){
                         transaction.settle();
+                    }
+                    else{
+                        if(players.indexOf(currentPlayer) == players.size()-1){
+                            currentPlayer = players.get(0);
+                        }
+                        else{
+                            currentPlayer = players.get(players.indexOf(currentPlayer) + 1);
+                        }
+                        continue;
+                    }
                 }
-                if(players.indexOf(currentPlayer) == players.size()-1){
-                    currentPlayer = players.get(0);
-                }
-                else{
-                    currentPlayer = players.get(players.indexOf(currentPlayer) + 1);
-                }
-                continue;
             }
 
             dice.roll();
