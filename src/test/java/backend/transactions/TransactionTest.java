@@ -43,7 +43,7 @@ class TransactionTest {
 
     @Test
     void settleProperty() {
-        PropertySquare prop = new PropertySquare("Prop", p, new int[]{1}, Group.GREEN, board);
+        PropertySquare prop = new PropertySquare("Prop", p, new int[]{1}, Group.GREEN, board, 100);
         p.addProperty(prop);
 
         transaction = new Transaction(p, p2, new Object[]{prop}, new Object[]{});
@@ -57,7 +57,7 @@ class TransactionTest {
 
     @Test
     void settleMixed() {
-        PropertySquare prop = new PropertySquare("Prop", p, new int[]{1}, Group.GREEN, board);
+        PropertySquare prop = new PropertySquare("Prop", p, new int[]{1}, Group.GREEN, board, 100);
         p.addProperty(prop);
 
         transaction = new Transaction(p, p2, new Object[]{prop}, new Object[]{200});

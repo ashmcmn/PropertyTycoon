@@ -40,6 +40,8 @@ public class FreeParking implements Party{
         this.cash = cash;
     }
 
+    public String getName() { return "free parking"; }
+
     public List<PropertySquare> getProperties() {
         return null;
     }

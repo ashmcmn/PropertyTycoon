@@ -17,19 +17,25 @@ public class PropertySquare extends Square {
     private int[] rents;
     private int level;
     private Group group;
+    private int cost;
 
     /**
      * Instantiates a new Square.
      *
      * @param name  the name of the square
      * @param owner the owner
+     * @param rents the different levels of rent payment
+     * @param group the group
+     * @param board the board
+     * @param cost  the cost of the property
      */
-    public PropertySquare(String name, Party owner, int[] rents, Group group, Board board) {
+    public PropertySquare(String name, Party owner, int[] rents, Group group, Board board, int cost) {
         super(name);
         this.owner = owner;
         this.rents = rents;
         this.group = group;
         this.board = board;
+        this.cost = cost;
     }
 
     /**
@@ -77,12 +83,14 @@ public class PropertySquare extends Square {
     @Override
     public void doAction(Player player, Board board) {
         if(owner == board.getBank()){
-            Transaction transaction = new Transaction(player, board.getBank(), new Object[]{}, new Object[]{this});
+            LOG.debug(player.getName() + " is buying " + getName());
+            Transaction transaction = new Transaction(player, board.getBank(), new Object[]{cost}, new Object[]{this});
             if(transaction.canSettle()){
                 transaction.settle();
             }
         }
         else if(owner != player){
+            LOG.debug(player.getName() + " pays " + getOwner() + " £" + getRent() + " in rent");
             Transaction transaction = new Transaction(player, owner, new Object[]{getRent()}, new Object[]{});
             if(transaction.canSettle())
                 transaction.settle();
@@ -154,4 +162,11 @@ public class PropertySquare extends Square {
     public int getLevel() {
         return level;
     }
+
+    /**
+     * Gets cost.
+     *
+     * @return the cost
+     */
+    public int getCost() { return cost; }
 }

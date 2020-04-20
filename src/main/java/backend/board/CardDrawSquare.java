@@ -31,6 +31,7 @@ public class CardDrawSquare extends Square {
     @Override
     public void doAction(Player player, Board board) {
         Card card = cardPile.draw();
+        LOG.debug(player.getName() + " has drawn a card: " + card.getDescription());
         if(card.getDescription().equals("Get out of jail free")){
             player.addGoof();
         }
