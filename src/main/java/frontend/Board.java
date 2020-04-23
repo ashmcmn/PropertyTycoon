@@ -1,17 +1,9 @@
-package frontend;
-/**
- * @author Connor van Graan
+/*
+  @author Connor van Graan
  */
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.Dictionary;
-import java.util.Hashtable;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import javafx.application.Application;
+package frontend;
+
 import javafx.application.Application;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -24,16 +16,18 @@ import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.Background;
-import javafx.scene.layout.BackgroundImage;
-import javafx.scene.layout.BackgroundPosition;
-import javafx.scene.layout.BackgroundRepeat;
-import javafx.scene.layout.BackgroundSize;
-import javafx.scene.layout.Pane;
+import javafx.scene.layout.*;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
-import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.Dictionary;
+import java.util.Hashtable;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 
 public class Board extends Application {
@@ -61,9 +55,9 @@ public class Board extends Application {
         this.players = players;
     }
 
-    public Pane setCells() throws MalformedURLException, IOException {
-        cells = new Hashtable<Integer, double[]>();
-        cells2 = new Hashtable<Integer, ImageView>();
+    public Pane setCells() {
+        cells = new Hashtable<>();
+        cells2 = new Hashtable<>();
 
         Image im = null;
         Pane g = new Pane();
@@ -80,21 +74,18 @@ public class Board extends Application {
             ImageView iv = new ImageView(im);
             int x = 638 - (i * 55);
             double[] d = {45, x};
-            cells.put((Integer) i, d);
+            cells.put(i, d);
             iv.setLayoutX(45);
             iv.setLayoutY(x);
             iv.setStyle("-sfx-font-size: 20; -fx-border-color: black");
             iv.setFitHeight(25);
             iv.setFitWidth(25);
-            iv.setOnMouseClicked(new EventHandler<MouseEvent>() {
-                @Override
-                public void handle(MouseEvent e) {
-                    double currentX = iv.getLayoutX();
-                    double currentY = iv.getLayoutY();
-                    System.out.println(String.format("%f,%f", currentX, currentY));
-                }
+            iv.setOnMouseClicked(e -> {
+                double currentX = iv.getLayoutX();
+                double currentY = iv.getLayoutY();
+                System.out.println(String.format("%f,%f", currentX, currentY));
             });
-            cells2.put((Integer) i, iv);
+            cells2.put(i, iv);
             g.getChildren().add(iv);
         }
 
@@ -117,7 +108,7 @@ public class Board extends Application {
             iv.setStyle("-sfx-font-size: 20; -fx-border-color: black");
             iv.setFitHeight(25);
             iv.setFitWidth(25);
-            cells2.put((Integer) i + 11, iv);
+            cells2.put(i + 11, iv);
             g.getChildren().add(iv);
         }
 
@@ -227,7 +218,7 @@ public class Board extends Application {
             try {
                 updateCell(grid);
             } catch (IOException ex) {
-                Logger.getLogger(PTUI.class.getName()).log(Level.SEVERE, null, ex);
+                Logger.getLogger(Board.class.getName()).log(Level.SEVERE, null, ex);
             }
         });
         grid.getChildren().add(roll);
@@ -251,7 +242,7 @@ public class Board extends Application {
             try {
                 updateCell(grid);
             } catch (IOException ex) {
-                Logger.getLogger(PTUI.class.getName()).log(Level.SEVERE, null, ex);
+                Logger.getLogger(Board.class.getName()).log(Level.SEVERE, null, ex);
             }
         });
         grid.getChildren().add(mana);
@@ -265,7 +256,7 @@ public class Board extends Application {
             try {
                 updateCell(grid);
             } catch (IOException ex) {
-                Logger.getLogger(PTUI.class.getName()).log(Level.SEVERE, null, ex);
+                Logger.getLogger(Board.class.getName()).log(Level.SEVERE, null, ex);
             }
         });
         grid.getChildren().add(purchase);
@@ -279,7 +270,7 @@ public class Board extends Application {
             try {
                 updateCell(grid);
             } catch (IOException ex) {
-                Logger.getLogger(PTUI.class.getName()).log(Level.SEVERE, null, ex);
+                Logger.getLogger(Board.class.getName()).log(Level.SEVERE, null, ex);
             }
         });
         grid.getChildren().add(end);
@@ -293,7 +284,7 @@ public class Board extends Application {
             try {
                 updateCell(grid);
             } catch (IOException ex) {
-                Logger.getLogger(PTUI.class.getName()).log(Level.SEVERE, null, ex);
+                Logger.getLogger(Board.class.getName()).log(Level.SEVERE, null, ex);
             }
         });
         grid.getChildren().add(menu);
