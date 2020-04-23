@@ -200,51 +200,61 @@ public class GameManager {
             for(Object importCard : importCards) {
                 JSONObject jsonCard = (JSONObject) importCard;
                 Card card = null;
-                if(jsonCard.get("actiontype").equals("Pay")){
-                    if(jsonCard.get("from").equals("All")){
-                        //TODO: collect cash from all players
-                        break;
-                    }
-
-                    Callable from;
-                    Callable to;
-                    switch(((String) jsonCard.get("from"))){
-                        case "Bank":
-                            from = () -> getBoard().getBank();
-                            break;
-                        case "Player":
-                            from = () -> getCurrentPlayer();
-                            break;
-                        default:
-                            throw new IllegalStateException("Unexpected value: " + ((String) jsonCard.get("from")));
-                    }
-
-                    switch(((String) jsonCard.get("to"))){
-                        case "Bank":
-                            to = () -> getBoard().getBank();
-                            break;
-                        case "Player":
-                            to = () -> getCurrentPlayer();
-                            break;
-                        case "FreeParking":
-                            to = () -> getBoard().getFreeParking();
-                            break;
-                        default:
-                            throw new IllegalStateException("Unexpected value: " + ((String) jsonCard.get("to")));
-                    }
-
-                    card = new Card((String) jsonCard.get("description"), new Action() {
-                        public void action() {
-                            Transaction transaction = null;
-                            try {
-                                transaction = new Transaction((Party) from.call(), (Party) to.call(), new Object[]{((Long) jsonCard.get("amount")).intValue()}, new Object[]{});
-                            } catch (Exception e) {
-                                e.printStackTrace();
+                if(jsonCard.get("actiontype").equals("Pay")) {
+                    if (jsonCard.get("from").equals("All")) {
+                        card = new Card((String) jsonCard.get("description"), new Action() {
+                            public void action() {
+                                for (Player player : players) {
+                                    if (player != getCurrentPlayer()) {
+                                        Transaction transaction = new Transaction(player, getCurrentPlayer(), new Object[]{((Long) jsonCard.get("amount")).intValue()}, new Object[]{});
+                                        if (transaction.canSettle()) {
+                                            transaction.settle();
+                                        }
+                                    }
+                                }
                             }
-                            if(transaction.canSettle())
-                                transaction.settle();
+                        });
+                    } else {
+                        Callable from;
+                        Callable to;
+                        switch (((String) jsonCard.get("from"))) {
+                            case "Bank":
+                                from = () -> getBoard().getBank();
+                                break;
+                            case "Player":
+                                from = this::getCurrentPlayer;
+                                break;
+                            default:
+                                throw new IllegalStateException("Unexpected value: " + ((String) jsonCard.get("from")));
                         }
-                    });
+
+                        switch (((String) jsonCard.get("to"))) {
+                            case "Bank":
+                                to = () -> getBoard().getBank();
+                                break;
+                            case "Player":
+                                to = this::getCurrentPlayer;
+                                break;
+                            case "FreeParking":
+                                to = () -> getBoard().getFreeParking();
+                                break;
+                            default:
+                                throw new IllegalStateException("Unexpected value: " + ((String) jsonCard.get("to")));
+                        }
+
+                        card = new Card((String) jsonCard.get("description"), new Action() {
+                            public void action() {
+                                Transaction transaction = null;
+                                try {
+                                    transaction = new Transaction((Party) from.call(), (Party) to.call(), new Object[]{((Long) jsonCard.get("amount")).intValue()}, new Object[]{});
+                                } catch (Exception e) {
+                                    e.printStackTrace();
+                                }
+                                if (transaction.canSettle())
+                                    transaction.settle();
+                            }
+                        });
+                    }
                 }
                 else if(jsonCard.get("actiontype").equals("Move")){
                     int where = ((Long) jsonCard.get("where")).intValue();
@@ -330,10 +340,22 @@ public class GameManager {
                     });
                 }
                 else if(jsonCard.get("actiontype").equals("PayRes")){
+                    JSONArray prices = (JSONArray) jsonCard.get("amount");
                     card = new Card((String) jsonCard.get("description"), new Action() {
                         public void action() {
                             int total = 0;
-                            //TODO: add once improvements are implemented
+                            for(PropertySquare prop : getCurrentPlayer().getProperties()){
+                                if(prop.getLevel() == 5){
+                                    total += ((Long) prices.get(1)).intValue();
+                                }
+                                else{
+                                    total += ((Long) prices.get(0)).intValue() * prop.getLevel();
+                                }
+                            }
+                            Transaction transaction = new Transaction(getCurrentPlayer(), getBoard().getBank(), new Object[]{total}, new Object[]{});
+                            if(transaction.canSettle()){
+                                transaction.settle();
+                            }
                         }
                     });
                 }

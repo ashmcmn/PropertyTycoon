@@ -393,7 +393,7 @@
           {
             "description": "You are assessed for repairs, £40/house, £115/hotel",
             "actiontype": "PayRes",
-            "amount": "40, 115",
+            "amount": [40, 115],
             "from": "Player",
             "to": "Bank"
           },
@@ -406,7 +406,7 @@
           {
             "description": "You are assessed for repairs, £25/house, £100/hotel",
             "actiontype": "PayRes",
-            "amount": "25, 100",
+            "amount": [25, 100],
             "from": "Player",
             "to": "Bank"
           },
