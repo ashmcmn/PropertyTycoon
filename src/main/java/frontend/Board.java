@@ -76,6 +76,7 @@ public class Board extends Application {
         //Left column cells
         for (int i = 1; i < 10; i++) {
             ImageView iv = new ImageView(icon);
+            iv.setImage(null);
             double y = (0.86458333333*height) - (i * (0.07552083333*height)); // (664/768) & (58/768)
 
             iv.setLayoutX(0.03660322108*width); //50/1366
@@ -94,9 +95,9 @@ public class Board extends Application {
 
         //Jail cell
         ImageView ix = new ImageView(icon);
+        ix.setImage(null);
         ix.setLayoutX(0.02342606149*width); // 32/1366
         ix.setLayoutY(0.05208333333*height); // 40/768
-
         ix.setStyle("-sfx-font-size: 20; -fx-border-color: black");
         ix.setFitHeight(25);
         ix.setFitWidth(25);
@@ -105,6 +106,8 @@ public class Board extends Application {
         //Top row
         for (int i = 0; i < 9; i++) {
             ImageView iv = new ImageView(icon);
+            iv.setImage(null);
+
             double x = (0.11786237188*width) + (i * (0.04868228404*width)); // (161//1366) & (66.5/768)
 
             iv.setLayoutX(x);
@@ -117,6 +120,8 @@ public class Board extends Application {
 
         //Community parking
         ImageView iz = new ImageView(icon);
+        iz.setImage(null);
+
         iz.setLayoutX(0.59077598828*width); // 807/1366
         iz.setLayoutY(0.05208333333*height); // 40/768
 
@@ -128,6 +133,7 @@ public class Board extends Application {
         //Right column
         for (int i = 0; i < 9; i++) {
             ImageView iv = new ImageView(icon);
+            iv.setImage(null);
 
             double y = (0.18229166666*height) + (i * (0.07552083333*height)); // (664/768) & (58/768)
 
@@ -141,6 +147,7 @@ public class Board extends Application {
 
         //Go to jail cell
         ImageView ii = new ImageView(icon);
+        ii.setImage(null);
         ii.setLayoutX(0.59077598828*width); // 807/1366
         ii.setLayoutY(0.91796875*height); // 705/768
 
@@ -152,6 +159,8 @@ public class Board extends Application {
         //Bottom row
         for (int i = 0; i < 9; i++) {
             ImageView iv = new ImageView(icon);
+            iv.setImage(null);
+
             //int x = 690 - (i * 66);
             double x = (0.50512445095*width) - (i * (0.04868228404*width)); // (161//1366) & (66.5/768)
 
@@ -165,6 +174,8 @@ public class Board extends Application {
 
         //Cell for jail
         ImageView iy = new ImageView(icon);
+        iy.setImage(null);
+
         iy.setLayoutX(0.06076134699*width);
         iy.setLayoutY(0.10416666666*height);
         iy.setStyle("-sfx-font-size: 20; -fx-border-color: black");
@@ -326,25 +337,27 @@ public class Board extends Application {
         money.setStyle("-sfx-font-size: 200; -fx-border-color: black;  -fx-font-weight: bold"); //-fx-background-color:GREEN;
         //money.setTextFill(Color.WHITE);
         money.setAlignment(Pos.CENTER);
-        money.setLayoutX(904);
-        money.setLayoutY(202);
+
+        money.setLayoutX(0.65812591508*width); // 899/1366
+        money.setLayoutY(0.25651041666*height); // 197/768
         money.setPrefSize(150, 60);
         grid.getChildren().add(money);
 
 
-        ImageView pi = new ImageView(icon);
+        ImageView pi = new ImageView(icon); //player icon
         labels.put("pi", pi);
-        pi.setLayoutX(1250); //player icon
-        pi.setLayoutY(188);
+        pi.setLayoutX(0.91142020497*width);// 1245/1366
+        pi.setLayoutY(0.24088541666*height); // 185/768
         pi.setFitWidth(60);
         pi.setFitHeight(70);
         grid.getChildren().add(pi);
 
-        Label name = new Label("name");
+        Label name = new Label("name"); // name tag
         labels.put("name", name);
-        name.setLayoutX(900);
-        name.setLayoutY(18);
-        name.setPrefSize(150, 60);
+
+        name.setLayoutX(0.65519765739*width); // 895/1366
+        name.setLayoutY(20); // 5/768
+        //name.setPrefSize(150, 60);
         name.setStyle("-sfx-font-size: 500;  -fx-font-weight: bold");// -fx-border-color: black;
         grid.getChildren().add(name);
 
