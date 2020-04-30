@@ -6,6 +6,8 @@ import backend.board.PropertySquare;
 import backend.board.Square;
 import backend.party.Party;
 import backend.transactions.Transaction;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -28,6 +30,7 @@ public class Player implements Party {
     private boolean jailed;
     private int jailedTurns = 0;
     private int goof;
+    protected static final Logger LOG = LogManager.getLogger(Player.class);
 
     /**
      * Instantiates a new Player.
@@ -129,6 +132,8 @@ public class Player implements Party {
         }
 
         setPosition(newPosition);
+
+        LOG.debug(getName() + " landed on " + board.getSquares()[newPosition].getName() + "(position: " + board.getSquares()[newPosition].getPosition() + ")");
 
         return board.getSquares()[newPosition];
     }
