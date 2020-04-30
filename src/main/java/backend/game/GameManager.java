@@ -58,8 +58,13 @@ public class GameManager {
         Collections.shuffle(players);
 
         this.board = new Board(new Square[]{}, new Bank(50000), players);
+        currentPlayer = board.getPlayer(0);
 
         loadConfig("config.json");
+    }
+
+    public Dice getDice() {
+        return dice;
     }
 
     /**
@@ -98,6 +103,22 @@ public class GameManager {
         this.currentPlayer = currentPlayer;
     }
 
+    public List<Player> getPlayers() {
+        return players;
+    }
+
+    public boolean isEnded() {
+        return ended;
+    }
+
+    public void addTurn() {
+        turn++;
+    }
+
+    public int getTurn() {
+        return turn;
+    }
+
     public static void main(String[] args){
         GameManager gameManager = new GameManager(new String[]{"P1", "P2"});
         gameManager.startGame();
@@ -108,7 +129,6 @@ public class GameManager {
      */
     public void startGame(){
         LOG.debug("Starting the game");
-        currentPlayer = board.getPlayer(0);
 
         while (!ended && turn < 1000){
             LOG.debug(currentPlayer.getName() + " is taking their turn, " + turn);
