@@ -1,13 +1,10 @@
-import frontend.controller.MainController;
-import frontend.view.GameView;
+import controller.MainController;
+import view.GameView;
 import javafx.application.Application;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.Scene;
-import javafx.scene.layout.GridPane;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
-
-import java.awt.desktop.SystemSleepEvent;
 
 public class Main extends Application {
 
@@ -17,6 +14,7 @@ public class Main extends Application {
 
         MainController controller = new MainController(primaryStage);
         GameView view = new GameView(controller, screenBounds.getWidth()*0.8, screenBounds.getHeight()*0.8);
+        controller.setView(view);
 
         Scene scene = new Scene(view, screenBounds.getWidth()*0.8, screenBounds.getHeight()*0.8);
         primaryStage.setTitle("Property Tycoon");
