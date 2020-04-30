@@ -161,42 +161,36 @@ public class GameView extends StackPane {
 
         // create the button for rolling the dice
         Button diceRollButton = new Button("Roll Dice");
-        diceRollButton.setOnAction(new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent actionEvent) {
-                controller.rollDiceHandler();
-            }
-        });
+        diceRollButton.setOnAction(actionEvent -> controller.rollDiceHandler());
         GridPane.setRowIndex(diceRollButton, 0);
         GridPane.setColumnIndex(diceRollButton, 0);
         diceRollButton.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
         userControls.put("RollDice", diceRollButton);
 
-        Button auctionButton = new Button("Goto Auction");
+        Button auctionButton = new Button("Auction Property");
         GridPane.setRowIndex(auctionButton, 0);
         GridPane.setColumnIndex(auctionButton, 1);
         auctionButton.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
-        userControls.put("Auction", auctionButton);
+        auctionButton.setDisable(true);
+        userControls.put("AuctionProperty", auctionButton);
 
         Button managePropertyButton = new Button("Manage Properties");
         GridPane.setRowIndex(managePropertyButton, 1);
         GridPane.setColumnIndex(managePropertyButton, 0);
         managePropertyButton.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
+        managePropertyButton.setDisable(true);
         userControls.put("ManageProperties", managePropertyButton);
 
         Button buyPropertyButton = new Button("Purchase Property");
+        buyPropertyButton.setOnAction(actionEvent -> controller.buyPropertyHandler());
         GridPane.setRowIndex(buyPropertyButton, 1);
         GridPane.setColumnIndex(buyPropertyButton, 1);
         buyPropertyButton.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
+        buyPropertyButton.setDisable(true);
         userControls.put("PurchaseProperty", buyPropertyButton);
 
         Button endTurnButton = new Button("End Turn");
-        endTurnButton.setOnAction(new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent actionEvent) {
-                controller.endTurnHandler();
-            }
-        });
+        endTurnButton.setOnAction(actionEvent -> controller.endTurnHandler());
         GridPane.setRowIndex(endTurnButton, 2);
         GridPane.setColumnIndex(endTurnButton, 0);
         endTurnButton.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);

@@ -1,10 +1,13 @@
 package controller;
 
 import com.sun.tools.javac.Main;
+import javafx.beans.property.Property;
 import javafx.scene.control.Button;
 import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
+import model.board.PropertySquare;
 import model.board.Square;
+import model.transactions.Transaction;
 import utilities.Utilities;
 import view.GameView;
 
@@ -48,6 +51,25 @@ public class MainController {
         int[] result = gameManager.getDice().getResult();
         Square square = gameManager.getCurrentPlayer().move(IntStream.of(result).sum(), true);
 
+        if(square.getClass() == PropertySquare.class){
+            if(((PropertySquare) square).getOwner() == gameManager.getBoard().getBank()){
+
+                view.getUserControls().get("EndTurn").setDisable(true);
+                view.getUserControls().get("RollDice").setDisable(true);
+
+                Transaction transaction = new Transaction(gameManager.getCurrentPlayer(), gameManager.getBoard().getBank(), new Object[]{((PropertySquare) square).getCost()}, new Object[]{square});
+                if(transaction.canSettle())
+                    view.getUserControls().get("PurchaseProperty").setDisable(false);
+                view.getUserControls().get("AuctionProperty").setDisable(false);
+            }
+            else{
+                square.doAction(gameManager.getCurrentPlayer(), gameManager.getBoard());
+            }
+        }
+        else{
+            square.doAction(gameManager.getCurrentPlayer(), gameManager.getBoard());
+        }
+
         coord = Utilities.indexToCoord(gameManager.getCurrentPlayer().getPosition());
         StackPane newPane = (StackPane) Utilities.getGridCell(view.getGameBoard(), coord[0], coord[1]);
         newPane.getChildren().add(gameManager.getCurrentPlayer().getBoardPiece());
@@ -61,5 +83,26 @@ public class MainController {
         view.getUserControls().get("EndTurn").setDisable(true);
         view.getUserControls().get("RollDice").setDisable(false);
         gameManager.endTurn();
+    }
+
+    public void buyPropertyHandler() {
+        PropertySquare property = (PropertySquare) gameManager.getBoard().getSquares()[gameManager.getCurrentPlayer().getPosition()];
+
+        Transaction transaction = new Transaction(gameManager.getCurrentPlayer(), gameManager.getBoard().getBank(), new Object[]{property.getCost()}, new Object[]{property});
+        transaction.settle();
+
+        view.getUserControls().get("PurchaseProperty").setDisable(true);
+        view.getUserControls().get("AuctionProperty").setDisable(true);
+
+        if(gameManager.getDice().wasDouble()){
+            view.getUserControls().get("EndTurn").setDisable(true);
+            view.getUserControls().get("RollDice").setDisable(false);
+        }
+        else{
+            view.getUserControls().get("EndTurn").setDisable(false);
+            view.getUserControls().get("RollDice").setDisable(true);
+        }
+
+        LOG.debug(gameManager.getCurrentPlayer().getName() + " is buying " + property.getName());
     }
 }
