@@ -83,19 +83,11 @@ public class PropertySquare extends Square {
      */
     @Override
     public void doAction(Player player, Board board) {
-        if(owner == board.getBank()){
-            Transaction transaction = new Transaction(player, board.getBank(), new Object[]{cost}, new Object[]{this});
-            if(transaction.canSettle()){
-                transaction.settle();
-                LOG.debug(player.getName() + " is buying " + getName());
-            }
-        }
-        else if(owner != player && !mortgaged){
-            LOG.debug(player.getName() + " pays " + getOwner().getName() + " £" + getRent() + " in rent");
-            Transaction transaction = new Transaction(player, owner, new Object[]{getRent()}, new Object[]{});
-            if(transaction.canSettle())
-                transaction.settle();
-        }
+        LOG.debug(player.getName() + " pays " + getOwner().getName() + " £" + getRent() + " in rent");
+        Transaction transaction = new Transaction(player, owner, new Object[]{getRent()}, new Object[]{});
+        if(transaction.canSettle())
+            transaction.settle();
+        else System.out.println("Cant afford to pay rent, implement system that handles this");
     }
 
     /**

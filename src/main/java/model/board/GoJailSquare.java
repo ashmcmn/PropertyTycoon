@@ -2,7 +2,9 @@ package model.board;
 
 import model.players.Player;
 
+import java.lang.reflect.Array;
 import java.util.List;
+import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 /**
@@ -29,11 +31,11 @@ public class GoJailSquare extends Square {
     @Override
     public void doAction(Player player, Board board) {
         LOG.debug("Sending " + player.getName() + " to jail");
-        int index = IntStream.range(0, board.getSquares().length)
-                .filter(i -> List.of(board.getSquares()).get(i).getName().equals("Go to jail"))
-                .findFirst()
-                .orElse(-1);
+        Square square = List.of(board.getSquares()).stream()
+                .filter(s -> s.getName().equals("Jail/Just visiting"))
+                .collect(Collectors.toList())
+                .get(0);
 
-        player.setPosition(index);
+        player.setPosition(square.getPosition());
     }
 }

@@ -473,7 +473,7 @@ public class GameManager {
                 getBoard().getBank().addProperty((PropertySquare) newSquare);
                 LOG.debug("Adding property square: " + newSquare.getName());
             }
-            newSquare.setPosition(((Long) importSquare.get("position")).intValue());
+            newSquare.setPosition(((Long) importSquare.get("position")).intValue()-1);
             squares[i] = newSquare;
         }
 
