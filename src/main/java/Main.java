@@ -8,15 +8,17 @@ import javafx.stage.Stage;
 
 public class Main extends Application {
 
+    private final double SIZEMOD = 0.8;
+
     @Override
     public void start(Stage primaryStage) throws Exception {
         Rectangle2D screenBounds = Screen.getPrimary().getBounds();
 
         MainController controller = new MainController(primaryStage);
-        GameView view = new GameView(controller, screenBounds.getWidth()*0.8, screenBounds.getHeight()*0.8);
+        GameView view = new GameView(controller, screenBounds.getWidth()*SIZEMOD, screenBounds.getHeight()*SIZEMOD);
         controller.setView(view);
 
-        Scene scene = new Scene(view, screenBounds.getWidth()*0.8, screenBounds.getHeight()*0.8);
+        Scene scene = new Scene(view, screenBounds.getWidth()*SIZEMOD, screenBounds.getHeight()*SIZEMOD);
         primaryStage.setTitle("Property Tycoon");
         primaryStage.setScene(scene);
         primaryStage.show();

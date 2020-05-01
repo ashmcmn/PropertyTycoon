@@ -1,23 +1,26 @@
 package controller;
 
-import com.sun.tools.javac.Main;
 import javafx.beans.property.Property;
-import javafx.scene.control.Button;
 import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
+import model.auction.Auction;
 import model.board.PropertySquare;
 import model.board.Square;
+import model.players.Player;
 import model.transactions.Transaction;
 import utilities.Utilities;
 import view.GameView;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+
+import java.util.Map;
 import java.util.stream.IntStream;
 
 public class MainController {
     private GameManager gameManager;
     private GameView view;
+    private Stage stage;
     private static final Logger LOG = LogManager.getLogger(MainController.class);
 
     public MainController(Stage stage) {
@@ -26,6 +29,14 @@ public class MainController {
 
     public GameManager getGameManager() {
         return gameManager;
+    }
+
+    public GameView getView() {
+        return view;
+    }
+
+    public Stage getStage() {
+        return stage;
     }
 
     public void rollDiceHandler() {
@@ -104,5 +115,11 @@ public class MainController {
         }
 
         LOG.debug(gameManager.getCurrentPlayer().getName() + " is buying " + property.getName());
+    }
+
+    public void auctionHandler() {
+        PropertySquare property = (PropertySquare) gameManager.getBoard().getSquares()[gameManager.getCurrentPlayer().getPosition()];
+        Auction auction = new Auction(property, gameManager.getPlayers(), gameManager.getBoard().getBank());
+        auction.getBids(this);
     }
 }

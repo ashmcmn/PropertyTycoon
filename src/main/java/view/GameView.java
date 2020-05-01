@@ -168,6 +168,7 @@ public class GameView extends StackPane {
         userControls.put("RollDice", diceRollButton);
 
         Button auctionButton = new Button("Auction Property");
+        auctionButton.setOnAction(actionEvent -> controller.auctionHandler());
         GridPane.setRowIndex(auctionButton, 0);
         GridPane.setColumnIndex(auctionButton, 1);
         auctionButton.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
