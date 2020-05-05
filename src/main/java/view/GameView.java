@@ -2,6 +2,11 @@ package view;
 
 import com.sun.webkit.network.Util;
 import javafx.scene.control.TextArea;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
+import javafx.scene.shape.Rectangle;
+import model.board.Group;
+import model.board.PropertySquare;
 import model.board.Square;
 import model.players.Player;
 import controller.MainController;
@@ -17,11 +22,13 @@ import javafx.scene.text.Text;
 import utilities.TextAreaAppender;
 import utilities.Utilities;
 
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
 /**
  * The type Game view.
@@ -31,6 +38,7 @@ public class GameView extends StackPane {
     private GridPane gameBoard;
     private MainController controller;
     private Map<String,Button> userControls;
+    private GridPane userPane;
 
     /**
      * Instantiates a new Game view.
@@ -96,7 +104,7 @@ public class GameView extends StackPane {
         userPane.setPadding(new Insets(20, 10, 20, 10));
 
         // create the pane to display assets of current player
-        StackPane assets = new StackPane();
+        GridPane assets = generateUserAssets(width, height/3);
         GridPane.setRowIndex(assets, 0);
         GridPane.setColumnIndex(assets, 0);
         assets.setPrefHeight(height / 3);
@@ -115,6 +123,7 @@ public class GameView extends StackPane {
         GridPane.setColumnIndex(assets, 0);
         gameLog.setPrefHeight(height / 3);
         gameLog.setPrefWidth(width);
+
         TextArea gameLogText = new TextArea();
         gameLogText.setWrapText(true);
         gameLogText.setEditable(false);
@@ -123,7 +132,127 @@ public class GameView extends StackPane {
 
         userPane.getChildren().addAll(assets, userControls, gameLog);
 
+        this.userPane = userPane;
         return userPane;
+    }
+
+    public GridPane generateUserAssets(double width, double height) {
+        Player player = controller.getGameManager().getCurrentPlayer();
+
+        GridPane pane = new GridPane();
+        pane.setStyle("-fx-border-color: black; -fx-border-width: 2; -fx-border-radius: 18 18 18 18;");
+
+        pane.setPrefHeight(height);
+        pane.setPrefWidth(width);
+
+        StackPane namePane = new StackPane();
+        namePane.setStyle(
+                "-fx-background-color: rgb(221, 233, 237); " +
+                        " -fx-background-radius: 18 18 0 0; -fx-border-width: 0 0 2 0; -fx-border-color: black");
+        namePane.setPrefWidth(width);
+        namePane.setPrefHeight(height/6);
+        GridPane.setColumnIndex(namePane, 0);
+        GridPane.setRowIndex(namePane, 0);
+
+        Text text = new Text();
+        text.setText(player.getName());
+        namePane.getChildren().add(text);
+
+        StackPane assetsPane = new StackPane();
+        assetsPane.setPadding(new Insets(20, 20, 20, 20));
+        GridPane.setColumnIndex(assetsPane, 0);
+        GridPane.setRowIndex(assetsPane, 1);
+        assetsPane.setPrefWidth(width);
+        assetsPane.setPrefHeight((height/6)*5);
+
+        GridPane propertyCards = new GridPane();
+        assetsPane.getChildren().add(propertyCards);
+        propertyCards.setHgap(5);
+        propertyCards.setVgap(5);
+
+        for(int x = 0; x <  Group.values().length; x++){
+            int finalX = x;
+            List<PropertySquare> properties = Stream.of(controller.getGameManager().getBoard().getSquares())
+                    .filter(PropertySquare.class::isInstance)
+                    .map(PropertySquare.class::cast)
+                    .sorted(Comparator.comparingInt(Square::getPosition))
+                    .filter(p -> p.getGroup() == Group.values()[finalX])
+                    .collect(Collectors.toList());
+
+            for(int y = 0; y < 4; y ++){
+                StackPane card = new StackPane();
+                
+                if(y < properties.size()) {
+                    PropertySquare property = properties.get(y);
+
+                    card.setBorder(new Border(new BorderStroke(Color.BLACK,
+                            BorderStrokeStyle.SOLID, CornerRadii.EMPTY, BorderWidths.DEFAULT)));
+
+                    Rectangle cardOpaque = new Rectangle();
+                    cardOpaque.setWidth(height / 14);
+                    cardOpaque.setHeight(height / 8);
+                    cardOpaque.setFill(Color.rgb(255, 255, 255, 0.8));
+
+                    card.setPrefWidth(height / 14);
+                    card.setPrefHeight(height / 8);
+
+                    Rectangle cardColor = new Rectangle();
+                    card.getChildren().add(cardColor);
+                    cardColor.setWidth(height / 14);
+                    cardColor.setHeight(height / 28);
+                    StackPane.setAlignment(cardColor, Pos.TOP_CENTER);
+
+                    switch (property.getGroup()) {
+                        case BLUE:
+                            cardColor.setFill(Color.rgb(147, 161, 206));
+                            break;
+                        case GREEN:
+                            cardColor.setFill(Color.rgb(96, 122, 34));
+                            break;
+                        case RED:
+                            cardColor.setFill(Color.rgb(196, 50, 39));
+                            break;
+                        case BROWN:
+                            cardColor.setFill(Color.rgb(130, 102, 89));
+                            break;
+                        case ORANGE:
+                            cardColor.setFill(Color.rgb(215, 106, 44));
+                            break;
+                        case PURPLE:
+                            cardColor.setFill(Color.rgb(195, 143, 182));
+                            break;
+                        case YELLOW:
+                            cardColor.setFill(Color.rgb(227, 185, 95));
+                            break;
+                        case DEEPBLUE:
+                            cardColor.setFill(Color.rgb(33, 86, 124));
+                            break;
+                    }
+
+                    if(property.getOwner() != player){
+                        card.getChildren().add(cardOpaque);
+                    }
+                }
+
+                GridPane.setColumnIndex(card, x);
+                GridPane.setRowIndex(card, y);
+
+                propertyCards.getChildren().add(card);
+            }
+        }
+
+        pane.getChildren().addAll(namePane, assetsPane);
+
+        return pane;
+    }
+
+    public GridPane generateUserAssets(){
+        return generateUserAssets(userPane.getWidth(), userPane.getHeight()/3);
+    }
+
+    public void updateAssets() {
+        userPane.getChildren().remove(0);
+        userPane.getChildren().add(0, generateUserAssets());
     }
 
     /**
@@ -199,6 +328,9 @@ public class GameView extends StackPane {
         userControls.put("EndTurn", endTurnButton);
 
         Button menuButton = new Button("Menu");
+        menuButton.setOnAction(actionEvent -> {
+            controller.getGameManager().getCurrentPlayer().sendToJail();
+        });
         GridPane.setRowIndex(menuButton, 2);
         GridPane.setColumnIndex(menuButton, 1);
         menuButton.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
@@ -211,16 +343,23 @@ public class GameView extends StackPane {
     // place the players on the intial board position
     private void placePlayers(List<Player> players, GridPane gameBoard) {
         for(Player player : players){
-            Text text = new Text();
-            text.setText(player.getName());
-            StackPane.setAlignment(text, Pos.CENTER);
-            player.setBoardPiece(text);
+            Image token = new Image(player.getToken().getPath());
+
+            ImageView imageView = new ImageView();
+            imageView.setImage(token);
+            imageView.setFitWidth(50);
+            imageView.setPreserveRatio(true);
+            imageView.setSmooth(true);
+            imageView.setCache(true);
+
+            StackPane.setAlignment(imageView, Pos.CENTER);
+            player.setBoardPiece(imageView);
 
             int[] coord = Utilities.indexToCoord(0);
 
             StackPane pane = (StackPane) Utilities.getGridCell(gameBoard, coord[0], coord[1]);
 
-            pane.getChildren().add(text);
+            pane.getChildren().add(imageView);
         }
 
     }

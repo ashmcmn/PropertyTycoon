@@ -36,6 +36,7 @@ public class GameManager {
     private boolean ended = false;
     private Dice dice;
     private int turn = 1;
+    private MainController controller;
     private static final Logger LOG = LogManager.getLogger(GameManager.class);
 
     /**
@@ -273,7 +274,7 @@ public class GameManager {
                     }
                 }
                 else if(jsonCard.get("actiontype").equals("Move")){
-                    int where = ((Long) jsonCard.get("where")).intValue();
+                    int where = ((Long) jsonCard.get("where")).intValue()-1;
                     boolean collect = (boolean) jsonCard.get("collect");
 
                     card = new Card((String) jsonCard.get("description"), new Action() {
@@ -283,7 +284,7 @@ public class GameManager {
                     });
                 }
                 else if(jsonCard.get("actiontype").equals("MoveBack")){
-                    int where = ((Long) jsonCard.get("where")).intValue();
+                    int where = ((Long) jsonCard.get("where")).intValue()-1;
 
                     card = new Card((String) jsonCard.get("description"), new Action() {
                         public void action() {
@@ -534,5 +535,9 @@ public class GameManager {
         else{
             currentPlayer = players.get(players.indexOf(currentPlayer) + 1);
         }
+    }
+
+    public void setController(MainController controller) {
+        this.controller = controller;
     }
 }

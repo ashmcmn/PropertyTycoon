@@ -1,14 +1,14 @@
 package model.players;
 
 import javafx.scene.Node;
-import model.board.Board;
-import model.board.Group;
-import model.board.PropertySquare;
-import model.board.Square;
+import javafx.scene.layout.GridPane;
+import javafx.scene.layout.StackPane;
+import model.board.*;
 import model.party.Party;
 import model.transactions.Transaction;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import utilities.Utilities;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,7 +26,7 @@ public class Player implements Party {
     private int cash;
     private int position;
     private Board board;
-    private boolean canBuy;
+    private boolean canBuy = false;
     private List<PropertySquare> properties;
     private boolean jailed;
     private int jailedTurns = 0;
@@ -98,6 +98,16 @@ public class Player implements Party {
      * @param position the position
      */
     public void setPosition(int position) {
+        GridPane gameBoard = (GridPane) boardPiece.getParent().getParent();
+
+        int[] coord = Utilities.indexToCoord(this.position);
+        StackPane oldPane = (StackPane) Utilities.getGridCell(gameBoard, coord[0], coord[1]);
+        oldPane.getChildren().remove(boardPiece);
+
+        coord = Utilities.indexToCoord(position);
+        StackPane newPane = (StackPane) Utilities.getGridCell(gameBoard, coord[0], coord[1]);
+        newPane.getChildren().add(boardPiece);
+
         this.position = position;
     }
 
@@ -131,6 +141,9 @@ public class Player implements Party {
 
         if(newPosition <= getPosition() && collectSalary){
             setCash(getCash() + 200);
+
+            if(!canBuy)
+                canBuy = true;
         }
 
         setPosition(newPosition);
@@ -172,7 +185,7 @@ public class Player implements Party {
      */
     public void sendToJail() {
         jailed = true;
-        setPosition(Stream.of(board.getSquares()).filter(s -> s.getName().equals("Jail/Just visiting")).collect(Collectors.toList()).get(0).getPosition() - 1);
+        setPosition(Stream.of(board.getSquares()).filter(JailSquare.class::isInstance).collect(Collectors.toList()).get(0).getPosition());
     }
 
     /**
@@ -271,6 +284,13 @@ public class Player implements Party {
         jailedTurns = 0;
     }
 
+    public boolean hasGoof() {
+        if(goof > 0){
+            return true;
+        }
+        return false;
+    }
+
     public boolean useGoof() {
         if(goof > 0){
             goof--;
@@ -287,4 +307,9 @@ public class Player implements Party {
     public void setBoardPiece(Node boardPiece) {
         this.boardPiece = boardPiece;
     }
+
+    public boolean canBuy() {
+        return canBuy;
+    }
+
 }

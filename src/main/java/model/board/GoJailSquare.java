@@ -31,11 +31,6 @@ public class GoJailSquare extends Square {
     @Override
     public void doAction(Player player, Board board) {
         LOG.debug("Sending " + player.getName() + " to jail");
-        Square square = List.of(board.getSquares()).stream()
-                .filter(s -> s.getName().equals("Jail/Just visiting"))
-                .collect(Collectors.toList())
-                .get(0);
-
-        player.setPosition(square.getPosition());
+        player.sendToJail();
     }
 }
