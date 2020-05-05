@@ -1,5 +1,6 @@
 package view;
 
+import javafx.beans.property.Property;
 import model.board.Group;
 import model.board.PropertySquare;
 import model.board.Square;
@@ -150,14 +151,17 @@ public class GameBoardGenerator {
 
         pane.getChildren().addAll(tileInfo, name);
 
+        if(square instanceof PropertySquare){
+            cost.setText("£" + ((PropertySquare) square).getCost());
+            pane.getChildren().add(cost);
+        }
+
         // add optional elements such as cost and color identification
         if (square instanceof PropertySquare && ((PropertySquare) square).getGroup() != Group.STATION && ((PropertySquare) square).getGroup() != Group.UTILITIES) {
             if (o == 0 || o == 180)
                 tileInfo.setHeight(height / 13f * 2 * 0.8);
             else
                 tileInfo.setWidth(height / 13f * 2 * 0.8);
-
-            cost.setText("£" + ((PropertySquare) square).getCost());
 
             switch (((PropertySquare) square).getGroup()) {
                 case BLUE:
@@ -186,7 +190,7 @@ public class GameBoardGenerator {
                     break;
             }
 
-            pane.getChildren().addAll(tileColor, cost);
+            pane.getChildren().addAll(tileColor);
         }
     }
 

@@ -5,17 +5,21 @@ import javafx.geometry.HPos;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.geometry.VPos;
+import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
-import javafx.scene.layout.ColumnConstraints;
-import javafx.scene.layout.GridPane;
-import javafx.scene.layout.RowConstraints;
-import javafx.scene.layout.StackPane;
+import javafx.scene.layout.*;
+import javafx.scene.paint.Color;
+import javafx.scene.shape.Rectangle;
+import javafx.scene.text.Font;
+import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextAlignment;
 import javafx.stage.Stage;
 import model.auction.Auction;
+import model.board.Board;
+import model.board.Group;
 import model.board.PropertySquare;
 import model.board.Square;
 import model.players.Player;
@@ -26,10 +30,12 @@ import view.GameView;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
 public class MainController {
     private GameManager gameManager;
@@ -104,7 +110,7 @@ public class MainController {
                 else view.getUserControls().get("EndTurn").setDisable(false);
 
             }
-            else{
+            else if(((PropertySquare) square).getOwner() != gameManager.getCurrentPlayer()){
                 square.doAction(gameManager.getCurrentPlayer(), gameManager.getBoard());
             }
         }
@@ -212,6 +218,10 @@ public class MainController {
         else{
             view.getUserControls().get("EndTurn").setDisable(true);
             view.getUserControls().get("RollDice").setDisable(false);
+
+            if(player.getProperties().size() > 0){
+                view.getUserControls().get("ManageProperties").setDisable(false);
+            }
         }
 
         view.updateAssets();
@@ -225,6 +235,7 @@ public class MainController {
 
         view.getUserControls().get("PurchaseProperty").setDisable(true);
         view.getUserControls().get("AuctionProperty").setDisable(true);
+        view.getUserControls().get("ManageProperties").setDisable(false);
 
         if(gameManager.getDice().wasDouble()){
             view.getUserControls().get("EndTurn").setDisable(true);
@@ -245,5 +256,280 @@ public class MainController {
         Auction auction = new Auction(property, potentialBuyers, gameManager.getBoard().getBank());
         auction.getBids(this);
         view.updateAssets();
+    }
+
+    public void managePropertiesHandler() {
+        Stage dialog = new Stage();
+        GridPane pane = new GridPane();
+
+        Player player = gameManager.getCurrentPlayer();
+
+        pane.setPrefHeight(600);
+        pane.setPrefWidth(500);
+
+        StackPane assetsPane = new StackPane();
+        assetsPane.setPadding(new Insets(20, 20, 20, 20));
+        GridPane.setColumnIndex(assetsPane, 0);
+        GridPane.setRowIndex(assetsPane, 0);
+        assetsPane.setPrefWidth(400);
+        assetsPane.setPrefHeight(500);
+
+        GridPane propertyCards = new GridPane();
+        assetsPane.getChildren().add(propertyCards);
+        propertyCards.setHgap(5);
+        propertyCards.setVgap(5);
+
+        for(int x = 0; x <  Group.values().length; x++){
+            int finalX = x;
+            List<PropertySquare> properties = Stream.of(gameManager.getBoard().getSquares())
+                    .filter(PropertySquare.class::isInstance)
+                    .map(PropertySquare.class::cast)
+                    .sorted(Comparator.comparingInt(Square::getPosition))
+                    .filter(p -> p.getGroup() == Group.values()[finalX])
+                    .collect(Collectors.toList());
+
+            for(int y = 0; y < 4; y ++){
+                StackPane card = new StackPane();
+
+                if(y < properties.size()) {
+                    PropertySquare property = properties.get(y);
+
+                    card.setBorder(new Border(new BorderStroke(Color.BLACK,
+                            BorderStrokeStyle.SOLID, CornerRadii.EMPTY, BorderWidths.DEFAULT)));
+
+                    Rectangle cardOpaque = new Rectangle();
+                    cardOpaque.setWidth(500 / 13);
+                    cardOpaque.setHeight(500 / 6);
+                    cardOpaque.setFill(Color.rgb(255, 255, 255, 0.8));
+
+                    card.setPrefWidth(500 / 13);
+                    card.setPrefHeight(500 / 6);
+
+                    Rectangle cardColor = new Rectangle();
+                    card.getChildren().add(cardColor);
+                    cardColor.setWidth(500 / 13);
+                    cardColor.setHeight(500 / 24);
+                    StackPane.setAlignment(cardColor, Pos.TOP_CENTER);
+
+                    switch (property.getGroup()) {
+                        case BLUE:
+                            cardColor.setFill(Color.rgb(147, 161, 206));
+                            break;
+                        case GREEN:
+                            cardColor.setFill(Color.rgb(96, 122, 34));
+                            break;
+                        case RED:
+                            cardColor.setFill(Color.rgb(196, 50, 39));
+                            break;
+                        case BROWN:
+                            cardColor.setFill(Color.rgb(130, 102, 89));
+                            break;
+                        case ORANGE:
+                            cardColor.setFill(Color.rgb(215, 106, 44));
+                            break;
+                        case PURPLE:
+                            cardColor.setFill(Color.rgb(195, 143, 182));
+                            break;
+                        case YELLOW:
+                            cardColor.setFill(Color.rgb(227, 185, 95));
+                            break;
+                        case DEEPBLUE:
+                            cardColor.setFill(Color.rgb(33, 86, 124));
+                            break;
+                    }
+
+                    if(property.getOwner() != player){
+                        card.getChildren().add(cardOpaque);
+                    }
+                    else {
+                        card.setOnMouseClicked(actionEvent -> {
+                            if(pane.getChildren().size() == 2){
+                                pane.getChildren().remove(1);
+                            }
+                            pane.getChildren().add(generatePropertyManager(property));
+                        });
+                    }
+                }
+
+                GridPane.setColumnIndex(card, x);
+                GridPane.setRowIndex(card, y);
+
+                propertyCards.getChildren().add(card);
+            }
+        }
+
+        pane.getChildren().addAll(assetsPane);
+
+        Scene scene = new Scene(pane, 500, 600);
+        dialog.setTitle("Manage Properties");
+        dialog.setScene(scene);
+        dialog.initOwner(getStage());
+        dialog.show();
+    }
+
+    public GridPane generatePropertyManager(PropertySquare property){
+        GridPane pane = new GridPane();
+        pane.setPrefWidth(500);
+        pane.setPrefHeight(200);
+        GridPane.setColumnIndex(pane, 0);
+        GridPane.setRowIndex(pane, 1);
+
+        if(property.getGroup() == Group.UTILITIES || property.getGroup() == Group.STATION){
+            ColumnConstraints c1 = new ColumnConstraints();
+            c1.setPrefWidth(500/3);
+            ColumnConstraints c2 = new ColumnConstraints();
+            c2.setPrefWidth(500/3);
+            pane.getColumnConstraints().addAll(c1,c2);
+
+            RowConstraints r1 = new RowConstraints();
+            r1.setPrefHeight(20);
+            RowConstraints r2 = new RowConstraints();
+            r2.setPrefHeight(100);
+            RowConstraints r3 = new RowConstraints();
+            r3.setPrefHeight(100);
+            pane.getRowConstraints().addAll(r1,r2,r3);
+
+            Text name = new Text(property.getName());
+            name.setFont(Font.font("Arial", FontWeight.BOLD, 16));
+            GridPane.setColumnSpan(name, 3);
+
+            pane.addRow(0, name);
+
+            Text mortgaged = new Text();
+            mortgaged.setText("Mortgaged: " + property.isMortgaged());
+
+            pane.addRow(1, mortgaged);
+
+            Button mortgage = new Button((property.isMortgaged() ? "Pay off mortgage" : "Mortgage") + " for £" + property.getCost()/2);
+            if(property.isMortgaged())
+                mortgage.setOnAction(actionEvent -> {
+                    property.payoff();
+                    GridPane parent = (GridPane) pane.getParent();
+                    parent.getChildren().remove(1);
+                    parent.getChildren().add(generatePropertyManager(property));
+                });
+            else mortgage.setOnAction(actionEvent -> {
+                property.mortgage();
+                GridPane parent = (GridPane) pane.getParent();
+                parent.getChildren().remove(1);
+                parent.getChildren().add(generatePropertyManager(property));
+            });
+
+            pane.addRow(2, mortgage);
+
+            for(Node node : pane.getChildren()){
+                GridPane.setHalignment(node, HPos.CENTER);
+                GridPane.setValignment(node, VPos.CENTER);
+            }
+        }
+        else{
+            ColumnConstraints c1 = new ColumnConstraints();
+            c1.setPrefWidth(500/3);
+            ColumnConstraints c2 = new ColumnConstraints();
+            c2.setPrefWidth(500/3);
+            ColumnConstraints c3 = new ColumnConstraints();
+            c3.setPrefWidth(500/3);
+            pane.getColumnConstraints().addAll(c1,c2,c3);
+
+            RowConstraints r1 = new RowConstraints();
+            r1.setPrefHeight(20);
+            RowConstraints r2 = new RowConstraints();
+            r2.setPrefHeight(100);
+            RowConstraints r3 = new RowConstraints();
+            r3.setPrefHeight(100);
+            pane.getRowConstraints().addAll(r1,r2,r3);
+
+            Board board = gameManager.getBoard();
+            Player player = gameManager.getCurrentPlayer();
+
+            Text name = new Text(property.getName());
+            name.setFont(Font.font("Arial", FontWeight.BOLD, 16));
+            GridPane.setColumnSpan(name, 3);
+
+            pane.addRow(0, name);
+
+            Text currentHouses = new Text();
+            currentHouses.setText("Houses: " + (property.getLevel() > 0 && property.getLevel() < 5 ? property.getLevel() : 0));
+
+            Text currentHotels = new Text();
+            currentHotels.setText("Hotels: " + (property.getLevel() == 5 ? 1 : 0));
+
+            Text mortgaged = new Text();
+            mortgaged.setText("Mortgaged: " + property.isMortgaged());
+
+            pane.addRow(1, currentHouses, currentHotels, mortgaged);
+
+            Button improve = new Button("Improve property for £" + board.getImprovementCost(property.getGroup(), 0));
+            if(!player.canImprove(property))
+                improve.setDisable(true);
+            improve.setOnAction(actionEvent -> {
+                player.improve(property);
+                GridPane parent = (GridPane) pane.getParent();
+                parent.getChildren().remove(1);
+                parent.getChildren().add(generatePropertyManager(property));
+            });
+
+            Button devalue = new Button("Devalue property for £" + board.getImprovementCost(property.getGroup(), property.getLevel() == 5 ? 1 : 0));
+            if(!player.canDevalue(property))
+                devalue.setDisable(true);
+            devalue.setOnAction(actionEvent -> {
+                player.devalue(property);
+                GridPane parent = (GridPane) pane.getParent();
+                parent.getChildren().remove(1);
+                parent.getChildren().add(generatePropertyManager(property));
+            });
+
+            Button mortgage = new Button((property.isMortgaged() ? "Pay off mortgage" : "Mortgage") + " for £" + property.getCost()/2);
+            if(property.getLevel() != 0)
+                mortgage.setDisable(true);
+            if(property.isMortgaged())
+                mortgage.setOnAction(actionEvent -> {
+                    property.payoff();
+                    GridPane parent = (GridPane) pane.getParent();
+                    parent.getChildren().remove(1);
+                    parent.getChildren().add(generatePropertyManager(property));
+                });
+            else mortgage.setOnAction(actionEvent -> {
+                property.mortgage();
+                GridPane parent = (GridPane) pane.getParent();
+                parent.getChildren().remove(1);
+                parent.getChildren().add(generatePropertyManager(property));
+            });
+
+            pane.addRow(2, improve, devalue, mortgage);
+
+            for(Node node : pane.getChildren()){
+                GridPane.setHalignment(node, HPos.CENTER);
+                GridPane.setValignment(node, VPos.CENTER);
+            }
+        }
+
+        return pane;
+    }
+
+    public void fileBankruptcyHandler() {
+        Player player = gameManager.getCurrentPlayer();
+
+        for(PropertySquare propertySquare : player.getProperties()){
+            propertySquare.setOwner(gameManager.getBoard().getBank());
+        }
+
+        Transaction transaction = new Transaction(player, gameManager.getBoard().getBank(), new Object[]{player.getCash()}, new Object[]{});
+        transaction.settle();
+
+        ((StackPane) player.getBoardPiece().getParent()).getChildren().remove(player.getBoardPiece());
+        gameManager.getPlayers().remove(player);
+
+        if(gameManager.getPlayers().size() == 1)
+            endGameHandler();
+        else endTurnHandler();
+    }
+
+    private void endGameHandler() {
+        LOG.debug(gameManager.getPlayers().get(0).getName() + " wins the game!");
+
+        for(Button button : view.getUserControls().values()){
+            button.setDisable(true);
+        }
     }
 }

@@ -203,6 +203,25 @@ public class Player implements Party {
                 .collect(Collectors.toList()));
     }
 
+    public boolean canImprove(PropertySquare property){
+        int type = 0;
+        if(property.getLevel() == 4)
+            type = 1;
+
+        if(ownsGroup(property.getGroup())){
+            Transaction transaction = new Transaction(this, board.getBank(), new Object[]{board.getImprovementCost(property.getGroup(), type)}, new Object[]{});
+            if(transaction.canSettle()){
+                return property.canAddLevel();
+            }
+            else{
+                return false;
+            }
+        }
+        else{
+            return false;
+        }
+    }
+
     /**
      * Improve a given property.
      *
@@ -230,6 +249,15 @@ public class Player implements Party {
             return false;
         }
         return true;
+    }
+
+    public boolean canDevalue(PropertySquare property){
+        if(ownsGroup(property.getGroup())){
+            return property.canRemoveLevel();
+        }
+        else{
+            return false;
+        }
     }
 
     /**

@@ -305,6 +305,7 @@ public class GameView extends StackPane {
         userControls.put("AuctionProperty", auctionButton);
 
         Button managePropertyButton = new Button("Manage Properties");
+        managePropertyButton.setOnAction(actionEvent -> controller.managePropertiesHandler());
         GridPane.setRowIndex(managePropertyButton, 1);
         GridPane.setColumnIndex(managePropertyButton, 0);
         managePropertyButton.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
@@ -327,16 +328,14 @@ public class GameView extends StackPane {
         endTurnButton.setDisable(true);
         userControls.put("EndTurn", endTurnButton);
 
-        Button menuButton = new Button("Menu");
-        menuButton.setOnAction(actionEvent -> {
-            controller.getGameManager().getCurrentPlayer().sendToJail();
-        });
-        GridPane.setRowIndex(menuButton, 2);
-        GridPane.setColumnIndex(menuButton, 1);
-        menuButton.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
-        userControls.put("Menu", menuButton);
+        Button bankruptButton = new Button("File Bankruptcy");
+        bankruptButton.setOnAction(actionEvent -> controller.fileBankruptcyHandler());
+        GridPane.setRowIndex(bankruptButton, 2);
+        GridPane.setColumnIndex(bankruptButton, 1);
+        bankruptButton.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
+        userControls.put("FileBankruptcy", bankruptButton);
 
-        grid.getChildren().addAll(diceRollButton, auctionButton, managePropertyButton, buyPropertyButton, endTurnButton, menuButton);
+        grid.getChildren().addAll(diceRollButton, auctionButton, managePropertyButton, buyPropertyButton, endTurnButton, bankruptButton);
         return controls;
     }
 

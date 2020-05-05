@@ -55,6 +55,9 @@ public class PropertySquare extends Square {
      */
     public void setOwner(Party owner) {
         this.owner = owner;
+        if(owner == board.getBank()){
+            level = 0;
+        }
     }
 
     /**
@@ -87,6 +90,9 @@ public class PropertySquare extends Square {
 
         if(((Player) owner).isJailed()){
             LOG.debug(getOwner().getName() + " is in jail so can't collect rent");
+        }
+        else if(mortgaged){
+            LOG.debug(getName() + " is mortgaged so rent can't be collected");
         }
         else{
             Transaction transaction = new Transaction(player, owner, new Object[]{getRent()}, new Object[]{});
@@ -153,6 +159,42 @@ public class PropertySquare extends Square {
         return true;
     }
 
+    public boolean canAddLevel() {
+        if(level == 5)
+            return false;
+
+        for (PropertySquare prop : Stream.of(board.getSquares())
+                .filter(PropertySquare.class::isInstance)
+                .map(PropertySquare.class::cast)
+                .filter(s -> s.getGroup() == group)
+                .collect(Collectors.toList())
+        ) {
+            if(prop.level - level < 0){
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    public boolean canRemoveLevel() {
+        if(level == 0)
+            return false;
+
+        for (PropertySquare prop : Stream.of(board.getSquares())
+                .filter(PropertySquare.class::isInstance)
+                .map(PropertySquare.class::cast)
+                .filter(s -> s.getGroup() == group)
+                .collect(Collectors.toList())
+        ) {
+            if(prop.level - level > 0){
+                return false;
+            }
+        }
+
+        return true;
+    }
+
     /**
      * Gets the level of development.
      *
@@ -186,5 +228,9 @@ public class PropertySquare extends Square {
         if(transaction.canSettle()){
             mortgaged = false;
         }
+    }
+
+    public boolean isMortgaged() {
+        return mortgaged;
     }
 }
