@@ -84,10 +84,16 @@ public class PropertySquare extends Square {
     @Override
     public void doAction(Player player, Board board) {
         LOG.debug(player.getName() + " pays " + getOwner().getName() + " £" + getRent() + " in rent");
-        Transaction transaction = new Transaction(player, owner, new Object[]{getRent()}, new Object[]{});
-        if(transaction.canSettle())
-            transaction.settle();
-        else System.out.println("Cant afford to pay rent, implement system that handles this");
+
+        if(((Player) owner).isJailed()){
+            LOG.debug(getOwner().getName() + " is in jail so can't collect rent");
+        }
+        else{
+            Transaction transaction = new Transaction(player, owner, new Object[]{getRent()}, new Object[]{});
+            if(transaction.canSettle())
+                transaction.settle();
+            else System.out.println("Cant afford to pay rent, implement system that handles this");
+        }
     }
 
     /**
