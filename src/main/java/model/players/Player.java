@@ -21,6 +21,7 @@ import java.util.stream.Stream;
  * @author Ashley McManamon
  */
 public class Player implements Party {
+    private boolean AI;
     private String name;
     private Token token;
     private int cash;
@@ -41,12 +42,13 @@ public class Player implements Party {
      * @param token the token to represent the player's position on the board
      * @param cash  the amount of cash currently held by the player
      */
-    public Player(String name, Token token, int cash) {
+    public Player(String name, Token token, int cash, boolean AI) {
         this.name = name;
         this.token = token;
         this.cash = cash;
         this.position = 0;
         this.properties = new ArrayList<>();
+        this.AI = AI;
     }
 
     /**
@@ -340,4 +342,7 @@ public class Player implements Party {
         return canBuy;
     }
 
+    public boolean isAI() {
+        return AI;
+    }
 }

@@ -22,6 +22,8 @@ import model.board.Board;
 import model.board.Group;
 import model.board.PropertySquare;
 import model.board.Square;
+import model.menu.PrePlayer;
+import model.players.Choice;
 import model.players.Player;
 import model.transactions.Transaction;
 import utilities.Utilities;
@@ -33,6 +35,7 @@ import org.apache.logging.log4j.Logger;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
@@ -43,8 +46,8 @@ public class MainController {
     private Stage stage;
     private static final Logger LOG = LogManager.getLogger(MainController.class);
 
-    public MainController(Stage stage) {
-        gameManager = new GameManager(new String[]{"P1","P2"});
+    public MainController(Stage stage, List<PrePlayer> prePlayers) {
+        gameManager = new GameManager(prePlayers);
         gameManager.setController(this);
     }
 
@@ -128,103 +131,169 @@ public class MainController {
 
         Player player = gameManager.getCurrentPlayer();
 
-        if(player.isJailed()){
-            view.getUserControls().get("EndTurn").setDisable(true);
-            view.getUserControls().get("RollDice").setDisable(true);
-
-            Stage dialog = new Stage();
-
-            GridPane pane = new GridPane();
-            pane.setStyle("-fx-background-color: red");
-            pane.setPrefHeight(300);
-            pane.setPrefWidth(200);
-
-            ColumnConstraints c1 = new ColumnConstraints();
-            c1.setPrefWidth(200);
-            pane.getColumnConstraints().add(c1);
-
-            RowConstraints r1 = new RowConstraints();
-            r1.setPrefHeight(75);
-            RowConstraints r2 = new RowConstraints();
-            r2.setPrefHeight(75);
-            RowConstraints r3 = new RowConstraints();
-            r3.setPrefHeight(75);
-            RowConstraints r4 = new RowConstraints();
-            r4.setPrefHeight(75);
-            pane.getRowConstraints().addAll(r1, r2, r3, r4);
-
-            Text text = new Text();
-            text.setText(player.getName() + " is in jail, what to do?");
-            text.setTextAlignment(TextAlignment.CENTER);
-            GridPane.setColumnIndex(text, 0);
-            GridPane.setRowIndex(text, 0);
-            GridPane.setHalignment(text, HPos.CENTER);
-            GridPane.setValignment(text, VPos.CENTER);
-
-            Button rollDice = new Button("Roll Dice");
-            rollDice.setAlignment(Pos.CENTER);
-            GridPane.setColumnIndex(rollDice, 0);
-            GridPane.setRowIndex(rollDice, 1);
-            GridPane.setHalignment(rollDice, HPos.CENTER);
-            GridPane.setValignment(rollDice, VPos.CENTER);
-
-            Button payBail = new Button("Pay Bail");
-            payBail.setAlignment(Pos.CENTER);
-            Transaction transaction = new Transaction(player, gameManager.getBoard().getBank(), new Object[]{50}, new Object[]{});
-            if(!transaction.canSettle())
-                payBail.setDisable(true);
-            GridPane.setColumnIndex(payBail, 0);
-            GridPane.setRowIndex(payBail, 2);
-            GridPane.setHalignment(payBail, HPos.CENTER);
-            GridPane.setValignment(payBail, VPos.CENTER);
-
-            Button useCard = new Button("Use Card");
-            useCard.setAlignment(Pos.CENTER);
-            if(!player.hasGoof())
-                useCard.setDisable(true);
-            GridPane.setColumnIndex(useCard, 0);
-            GridPane.setRowIndex(useCard, 3);
-            GridPane.setHalignment(useCard, HPos.CENTER);
-            GridPane.setValignment(useCard, VPos.CENTER);
-
-            rollDice.setOnAction(actionEvent -> {
-                dialog.close();
-                rollDiceHandler();
-            });
-
-            payBail.setOnAction(actionEvent -> {
-                transaction.settle();
-                player.releaseFromJail();
-                dialog.close();
-                view.getUserControls().get("EndTurn").setDisable(true);
-                view.getUserControls().get("RollDice").setDisable(false);
-            });
-
-            useCard.setOnAction(actionEvent -> {
-                player.useGoof();
-                dialog.close();
-                view.getUserControls().get("EndTurn").setDisable(true);
-                view.getUserControls().get("RollDice").setDisable(false);
-            });
-
-            pane.getChildren().addAll(text, rollDice, payBail, useCard);
-
-            Scene scene = new Scene(pane, 200, 300);
-            dialog.setTitle(player.getName() + " is jailed");
-            dialog.setScene(scene);
-            dialog.initOwner(getStage());
-            dialog.show();
+        if(player.isAI()){
+            handleAITurn();
         }
-        else{
-            view.getUserControls().get("EndTurn").setDisable(true);
-            view.getUserControls().get("RollDice").setDisable(false);
+        else {
+            if (player.isJailed()) {
+                view.getUserControls().get("EndTurn").setDisable(true);
+                view.getUserControls().get("RollDice").setDisable(true);
 
-            if(player.getProperties().size() > 0){
-                view.getUserControls().get("ManageProperties").setDisable(false);
+                Stage dialog = new Stage();
+
+                GridPane pane = new GridPane();
+                pane.setStyle("-fx-background-color: red");
+                pane.setPrefHeight(300);
+                pane.setPrefWidth(200);
+
+                ColumnConstraints c1 = new ColumnConstraints();
+                c1.setPrefWidth(200);
+                pane.getColumnConstraints().add(c1);
+
+                RowConstraints r1 = new RowConstraints();
+                r1.setPrefHeight(75);
+                RowConstraints r2 = new RowConstraints();
+                r2.setPrefHeight(75);
+                RowConstraints r3 = new RowConstraints();
+                r3.setPrefHeight(75);
+                RowConstraints r4 = new RowConstraints();
+                r4.setPrefHeight(75);
+                pane.getRowConstraints().addAll(r1, r2, r3, r4);
+
+                Text text = new Text();
+                text.setText(player.getName() + " is in jail, what to do?");
+                text.setTextAlignment(TextAlignment.CENTER);
+                GridPane.setColumnIndex(text, 0);
+                GridPane.setRowIndex(text, 0);
+                GridPane.setHalignment(text, HPos.CENTER);
+                GridPane.setValignment(text, VPos.CENTER);
+
+                Button rollDice = new Button("Roll Dice");
+                rollDice.setAlignment(Pos.CENTER);
+                GridPane.setColumnIndex(rollDice, 0);
+                GridPane.setRowIndex(rollDice, 1);
+                GridPane.setHalignment(rollDice, HPos.CENTER);
+                GridPane.setValignment(rollDice, VPos.CENTER);
+
+                Button payBail = new Button("Pay Bail");
+                payBail.setAlignment(Pos.CENTER);
+                Transaction transaction = new Transaction(player, gameManager.getBoard().getBank(), new Object[]{50}, new Object[]{});
+                if (!transaction.canSettle())
+                    payBail.setDisable(true);
+                GridPane.setColumnIndex(payBail, 0);
+                GridPane.setRowIndex(payBail, 2);
+                GridPane.setHalignment(payBail, HPos.CENTER);
+                GridPane.setValignment(payBail, VPos.CENTER);
+
+                Button useCard = new Button("Use Card");
+                useCard.setAlignment(Pos.CENTER);
+                if (!player.hasGoof())
+                    useCard.setDisable(true);
+                GridPane.setColumnIndex(useCard, 0);
+                GridPane.setRowIndex(useCard, 3);
+                GridPane.setHalignment(useCard, HPos.CENTER);
+                GridPane.setValignment(useCard, VPos.CENTER);
+
+                rollDice.setOnAction(actionEvent -> {
+                    dialog.close();
+                    rollDiceHandler();
+                });
+
+                payBail.setOnAction(actionEvent -> {
+                    transaction.settle();
+                    player.releaseFromJail();
+                    dialog.close();
+                    view.getUserControls().get("EndTurn").setDisable(true);
+                    view.getUserControls().get("RollDice").setDisable(false);
+                });
+
+                useCard.setOnAction(actionEvent -> {
+                    player.useGoof();
+                    dialog.close();
+                    view.getUserControls().get("EndTurn").setDisable(true);
+                    view.getUserControls().get("RollDice").setDisable(false);
+                });
+
+                pane.getChildren().addAll(text, rollDice, payBail, useCard);
+
+                Scene scene = new Scene(pane, 200, 300);
+                dialog.setTitle(player.getName() + " is jailed");
+                dialog.setScene(scene);
+                dialog.initOwner(getStage());
+                dialog.show();
+            } else {
+                view.getUserControls().get("EndTurn").setDisable(true);
+                view.getUserControls().get("RollDice").setDisable(false);
+
+                if (player.getProperties().size() > 0) {
+                    view.getUserControls().get("ManageProperties").setDisable(false);
+                }
             }
         }
 
         view.updateAssets();
+    }
+
+    public void handleAITurn() {
+        Player currentPlayer = gameManager.getCurrentPlayer();
+
+        Choice choice = new Choice();
+
+        if(currentPlayer.isJailed()){
+            Transaction transaction = new Transaction(currentPlayer, gameManager.getBoard().getBank(), new Object[]{50}, new Object[]{});
+
+            if(transaction.canSettle()){
+                choice.add(transaction::settle);
+                currentPlayer.releaseFromJail();
+                gameManager.getDice().roll();
+            }
+
+            choice.add(() -> {
+                gameManager.getDice().roll();
+            });
+
+            choice.decide();
+
+            if(!gameManager.getDice().wasDouble() && currentPlayer.isJailed())
+                return;
+            else {
+                currentPlayer.releaseFromJail();
+                gameManager.getDice().roll();
+            }
+        }
+        else{
+            gameManager.getDice().roll();
+        }
+
+        int[] result = gameManager.getDice().getResult();
+        Square square = gameManager.getCurrentPlayer().move(IntStream.of(result).sum(), true);
+
+        if(square.getClass() == PropertySquare.class){
+            PropertySquare property = (PropertySquare) gameManager.getBoard().getSquares()[gameManager.getCurrentPlayer().getPosition()];
+            if(property.getOwner() == gameManager.getBoard().getBank()){
+                if(gameManager.getCurrentPlayer().canBuy()){
+                    Transaction transaction = new Transaction(gameManager.getCurrentPlayer(), gameManager.getBoard().getBank(), new Object[]{property.getCost()}, new Object[]{property});
+
+                    choice = new Choice();
+
+                    if(transaction.canSettle()) {
+                        choice.add(() -> transaction.settle());
+                    }
+
+                    choice.add(() -> auctionHandler());
+
+                    choice.decide();
+                }
+            }
+            else if(((PropertySquare) square).getOwner() != gameManager.getCurrentPlayer()){
+                square.doAction(gameManager.getCurrentPlayer(), gameManager.getBoard());
+            }
+        }
+        else{
+            square.doAction(gameManager.getCurrentPlayer(), gameManager.getBoard());
+        }
+
+        endTurnHandler();
     }
 
     public void buyPropertyHandler() {

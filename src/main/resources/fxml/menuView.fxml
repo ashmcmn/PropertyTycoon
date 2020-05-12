@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.CheckBox?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+<?import javafx.scene.text.Text?>
+
+<AnchorPane prefHeight="500.0" prefWidth="500.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1">
+   <children>
+      <VBox alignment="TOP_CENTER" prefHeight="400.0" prefWidth="500.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+         <children>
+            <StackPane prefHeight="150.0" prefWidth="200.0">
+               <children>
+                  <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Property Tycoon" textAlignment="CENTER">
+                     <font>
+                        <Font size="36.0" />
+                     </font></Text>
+               </children></StackPane>
+            <StackPane prefHeight="90.0" prefWidth="200.0">
+               <children>
+                  <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Abridged or classic version?" StackPane.alignment="TOP_CENTER" />
+                  <HBox alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="50.0" prefWidth="300.0">
+                     <children>
+                        <CheckBox fx:id="abridgedCheck" mnemonicParsing="false" onAction="#handleAbridgedCheck" text="Abridged">
+                           <HBox.margin>
+                              <Insets right="20.0" />
+                           </HBox.margin></CheckBox>
+                        <CheckBox fx:id="classicCheck" mnemonicParsing="false" onAction="#handleClassicCheck" text="Classic" />
+                     </children></HBox>
+               </children>
+               <padding>
+                  <Insets bottom="5.0" top="5.0" />
+               </padding>
+            </StackPane>
+            <StackPane fx:id="timeLimitPane" maxHeight="-Infinity" prefHeight="27.0" prefWidth="200.0" visible="false">
+               <children>
+                  <HBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="27.0" prefWidth="200.0" StackPane.alignment="CENTER">
+                     <children>
+                        <StackPane maxWidth="-Infinity" minWidth="-Infinity" prefHeight="150.0" prefWidth="70.0">
+                           <children>
+                              <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Time Limit" wrappingWidth="59.4560546875" />
+                           </children>
+                        </StackPane>
+                        <TextField maxWidth="-Infinity" />
+                     </children>
+                  </HBox>
+               </children>
+            </StackPane>
+            <StackPane maxHeight="-Infinity" minHeight="-Infinity" prefHeight="150.0" prefWidth="200.0">
+               <children>
+                  <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Players" StackPane.alignment="TOP_CENTER" />
+                  <ScrollPane fitToHeight="true" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="120.0" prefWidth="200.0" StackPane.alignment="BOTTOM_CENTER">
+                    <content>
+                      <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="200.0" prefWidth="200.0">
+                           <children>
+                              <HBox fx:id="playerList" prefHeight="120.0" prefWidth="200.0">
+                                 <children>
+                                    <StackPane prefHeight="150.0" prefWidth="200.0">
+                                       <children>
+                                          <Button mnemonicParsing="false" onAction="#handleAddPlayer" text="Add Player" />
+                                       </children>
+                                    </StackPane>
+                                 </children>
+                              </HBox>
+                           </children>
+                        </AnchorPane>
+                    </content>
+                  </ScrollPane>
+               </children>
+               <VBox.margin>
+                  <Insets top="20.0" />
+               </VBox.margin>
+            </StackPane>
+            <StackPane maxHeight="-Infinity" prefHeight="100.0" prefWidth="200.0">
+               <children>
+                  <Button mnemonicParsing="false" onAction="#handleStartGame" text="Start Game" />
+               </children>
+            </StackPane>
+         </children></VBox>
+   </children>
+</AnchorPane>

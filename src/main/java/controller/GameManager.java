@@ -1,11 +1,11 @@
 package controller;
 
-import javafx.scene.layout.StackPane;
 import model.board.*;
 import model.cards.Action;
 import model.cards.Card;
 import model.cards.CardPile;
 import model.dice.Dice;
+import model.menu.PrePlayer;
 import model.party.Bank;
 import model.party.Party;
 import model.players.Player;
@@ -24,7 +24,6 @@ import java.util.stream.IntStream;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import utilities.Utilities;
 
 /**
  * The type Game manager.
@@ -42,19 +41,13 @@ public class GameManager {
     /**
      * Instantiates a new Game manager.
      *
-     * @param playerNames the names of the players
      */
-    public GameManager(String[] playerNames) {
-
-
+    public GameManager(List<PrePlayer> prePlayers) {
         players = new LinkedList<>();
         dice = new Dice();
 
-        List<Token> tokens = new ArrayList<>(List.of(Token.values()));
-        Random rand = new Random();
-
-        for (String playerName : playerNames) {
-            players.add(new Player(playerName, tokens.remove(rand.nextInt(tokens.size())), 1500));
+        for (PrePlayer player : prePlayers) {
+            players.add(new Player(player.getName(), player.getToken(), 1500, player.getAi()));
         }
 
         Collections.shuffle(players);

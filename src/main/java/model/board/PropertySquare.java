@@ -1,5 +1,6 @@
 package model.board;
 
+import model.party.Bank;
 import model.party.Party;
 import model.players.Player;
 import model.transactions.Transaction;
