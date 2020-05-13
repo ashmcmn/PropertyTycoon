@@ -5,6 +5,7 @@ import model.party.Party;
 import model.players.Player;
 import model.transactions.Transaction;
 
+import java.util.Random;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -99,7 +100,18 @@ public class PropertySquare extends Square {
             Transaction transaction = new Transaction(player, owner, new Object[]{getRent()}, new Object[]{});
             if(transaction.canSettle())
                 transaction.settle();
-            else System.out.println("Cant afford to pay rent, implement system that handles this");
+            else {
+                if(player.isAI() && player.getProperties().stream().filter(p -> !p.isMortgaged()).count() > 0){
+                    Random random = new Random();
+                    int index = random.nextInt((int) player.getProperties().stream().filter(p -> !p.isMortgaged()).count());
+                    PropertySquare prop = player.getProperties().stream().filter(p -> !p.isMortgaged()).collect(Collectors.toList()).get(index);
+                    prop.mortgage();
+                    doAction(player, board);
+                }
+                else if(player.isAI()){
+                    transaction.settle();
+                }
+            }
         }
     }
 
@@ -228,6 +240,7 @@ public class PropertySquare extends Square {
         Transaction transaction = new Transaction(owner, board.getBank(), new Object[]{cost/2}, new Object[]{});
         if(transaction.canSettle()){
             mortgaged = false;
+            transaction.settle();
         }
     }
 

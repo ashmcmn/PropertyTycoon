@@ -83,48 +83,66 @@ public class Auction {
         };
 
         if(player != null){
-            Stage dialog = new Stage();
+            if(player.isAI()){
+                Random rand = new Random();
+                int bid;
 
-            StackPane pane = new StackPane();
-
-            Text text = new Text();
-            text.setText(player.getName() + ", enter your bid:");
-            StackPane.setAlignment(text, Pos.TOP_CENTER);
-            StackPane.setMargin(text, new Insets(8,8,8,8));
-            text.setTextAlignment(TextAlignment.CENTER);
-
-            TextField input = new TextField();
-            input.setAlignment(Pos.CENTER);
-            StackPane.setMargin(input, new Insets(8,8,8,8));
-
-            Button submit = new Button();
-            submit.setText("Submit");
-            submit.setDisable(true);
-            Player finalPlayer = player;
-            submit.setOnAction(actionEvent -> {
-                bids.put(finalPlayer, Integer.valueOf(input.getText()));
-                dialog.close();
-                getBids(controller);
-            });
-            input.textProperty().addListener((a,b,c) -> {
-                if(Integer.parseInt(c) < finalPlayer.getCash()){
-                    submit.setDisable(false);
+                if(property.getCost()*1.2 < player.getCash()){
+                    bid = (int) (rand.nextInt((int) (property.getCost()*0.4)) + property.getCost()*0.8);
+                }
+                else if(player.getCash() < 10){
+                    bid = 0;
                 }
                 else{
-                    submit.setDisable(true);
+                    bid = (int) (rand.nextInt((int) (player.getCash()*0.4)) + player.getCash()*0.8);
                 }
-            });
-            StackPane.setMargin(submit, new Insets(8,8,8,8));
-            submit.setAlignment(Pos.BOTTOM_CENTER);
-            StackPane.setAlignment(submit, Pos.BOTTOM_CENTER);
 
-            pane.getChildren().addAll(text, input, submit);
+                bids.put(player, bid);
+                getBids(controller);
+            }
+            else {
+                Stage dialog = new Stage();
 
-            Scene scene = new Scene(pane, 200, 140);
-            dialog.setTitle(player.getName() + " enter bid");
-            dialog.setScene(scene);
-            dialog.initOwner(controller.getStage());
-            dialog.show();
+                StackPane pane = new StackPane();
+
+                Text text = new Text();
+                text.setText(player.getName() + ", enter your bid:");
+                StackPane.setAlignment(text, Pos.TOP_CENTER);
+                StackPane.setMargin(text, new Insets(8, 8, 8, 8));
+                text.setTextAlignment(TextAlignment.CENTER);
+
+                TextField input = new TextField();
+                input.setAlignment(Pos.CENTER);
+                StackPane.setMargin(input, new Insets(8, 8, 8, 8));
+
+                Button submit = new Button();
+                submit.setText("Submit");
+                submit.setDisable(true);
+                Player finalPlayer = player;
+                submit.setOnAction(actionEvent -> {
+                    bids.put(finalPlayer, Integer.valueOf(input.getText()));
+                    dialog.close();
+                    getBids(controller);
+                });
+                input.textProperty().addListener((a, b, c) -> {
+                    if (Integer.parseInt(c) < finalPlayer.getCash()) {
+                        submit.setDisable(false);
+                    } else {
+                        submit.setDisable(true);
+                    }
+                });
+                StackPane.setMargin(submit, new Insets(8, 8, 8, 8));
+                submit.setAlignment(Pos.BOTTOM_CENTER);
+                StackPane.setAlignment(submit, Pos.BOTTOM_CENTER);
+
+                pane.getChildren().addAll(text, input, submit);
+
+                Scene scene = new Scene(pane, 200, 140);
+                dialog.setTitle(player.getName() + " enter bid");
+                dialog.setScene(scene);
+                dialog.initOwner(controller.getStage());
+                dialog.show();
+            }
         }
     }
 }

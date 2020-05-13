@@ -114,11 +114,15 @@ public class MenuController {
 
     public void handleAbridgedCheck(ActionEvent actionEvent) {
         ((CheckBox) view.lookup("#classicCheck")).setSelected(false);
+        view.lookup("#abridgedCheck").setDisable(true);
+        view.lookup("#classicCheck").setDisable(false);
         view.lookup("#timeLimitPane").setVisible(true);
     }
 
     public void handleClassicCheck(ActionEvent actionEvent) {
         ((CheckBox) view.lookup("#abridgedCheck")).setSelected(false);
+        view.lookup("#classicCheck").setDisable(true);
+        view.lookup("#abridgedCheck").setDisable(false);
         view.lookup("#timeLimitPane").setVisible(false);
     }
 
@@ -130,8 +134,15 @@ public class MenuController {
 
     public void handleStartGame() {
         Rectangle2D screenBounds = Screen.getPrimary().getVisualBounds();
+        MainController controller;
 
-        MainController controller = new MainController(primaryStage, players);
+        if(((CheckBox) view.lookup("#abridgedCheck")).isSelected()){
+            controller = new MainController(primaryStage, players, Long.parseLong(((TextField) view.lookup("#timeLimit")).getText()));
+        }
+        else{
+            controller = new MainController(primaryStage, players);
+        }
+
         GameView view = new GameView(controller, screenBounds.getWidth() * 0.8, screenBounds.getHeight() * 0.8);
         controller.setView(view);
 

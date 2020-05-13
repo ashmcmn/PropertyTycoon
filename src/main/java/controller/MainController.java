@@ -32,10 +32,12 @@ import view.GameView;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import javax.swing.*;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
@@ -48,6 +50,11 @@ public class MainController {
 
     public MainController(Stage stage, List<PrePlayer> prePlayers) {
         gameManager = new GameManager(prePlayers);
+        gameManager.setController(this);
+    }
+
+    public MainController(Stage stage, List<PrePlayer> prePlayers, long timeLimit) {
+        gameManager = new GameManager(prePlayers, timeLimit);
         gameManager.setController(this);
     }
 
@@ -64,22 +71,19 @@ public class MainController {
     }
 
     public void rollDiceHandler() {
+        LOG.debug(gameManager.getCurrentPlayer().getName() + " rolls the dice");
         gameManager.getDice().roll();
 
         if(!gameManager.getDice().wasDouble()) {
             view.getUserControls().get("RollDice").setDisable(true);
             view.getUserControls().get("EndTurn").setDisable(false);
 
-            if(gameManager.getDice().getDoubles() == 3){
-                gameManager.getCurrentPlayer().sendToJail();
-                gameManager.getDice().resetDoubles();
-            }
-
             if(gameManager.getCurrentPlayer().isJailed()){
                 gameManager.getCurrentPlayer().addJailedTurn();
                 if(gameManager.getCurrentPlayer().getJailedTurns() == 3) {
                     LOG.debug(gameManager.getCurrentPlayer().getName() + " has been in jail 3 turns so they have been released");
                     gameManager.getCurrentPlayer().releaseFromJail();
+                    view.getUserControls().get("EndTurn").setDisable(false);
                 }
                 else LOG.debug("A double was not rolled so " + gameManager.getCurrentPlayer().getName() + " stays in jail");
                 return;
@@ -91,13 +95,20 @@ public class MainController {
                 gameManager.getCurrentPlayer().releaseFromJail();
                 gameManager.getDice().resetDoubles();
             }
+            else if(gameManager.getDice().getDoubles() == 3){
+                gameManager.getCurrentPlayer().sendToJail();
+                gameManager.getDice().resetDoubles();
+                view.getUserControls().get("RollDice").setDisable(true);
+                view.getUserControls().get("EndTurn").setDisable(false);
+            }
             else{
-                LOG.debug("A double was rolled so " + gameManager.getCurrentPlayer().getName() + " takes another turn");
+                LOG.debug("A double was rolled so " + gameManager.getCurrentPlayer().getName() + " will take another turn");
             }
         }
 
         int[] result = gameManager.getDice().getResult();
         Square square = gameManager.getCurrentPlayer().move(IntStream.of(result).sum(), true);
+        view.updateAssets();
 
         if(square.getClass() == PropertySquare.class){
             if(((PropertySquare) square).getOwner() == gameManager.getBoard().getBank()){
@@ -110,15 +121,22 @@ public class MainController {
                     view.getUserControls().get("PurchaseProperty").setDisable(false);
                 if(gameManager.getCurrentPlayer().canBuy())
                     view.getUserControls().get("AuctionProperty").setDisable(false);
-                else view.getUserControls().get("EndTurn").setDisable(false);
+                else {
+                    if(gameManager.getDice().wasDouble())
+                        view.getUserControls().get("RollDice").setDisable(false);
+                    else
+                        view.getUserControls().get("EndTurn").setDisable(false);
+                }
 
             }
             else if(((PropertySquare) square).getOwner() != gameManager.getCurrentPlayer()){
                 square.doAction(gameManager.getCurrentPlayer(), gameManager.getBoard());
+                view.updateAssets();
             }
         }
         else{
             square.doAction(gameManager.getCurrentPlayer(), gameManager.getBoard());
+            view.updateAssets();
         }
     }
 
@@ -127,6 +145,8 @@ public class MainController {
     }
 
     public void endTurnHandler() {
+        LOG.debug(gameManager.getCurrentPlayer().getName() + " has ended their turn");
+
         gameManager.endTurn();
 
         Player player = gameManager.getCurrentPlayer();
@@ -203,6 +223,7 @@ public class MainController {
                     transaction.settle();
                     player.releaseFromJail();
                     dialog.close();
+                    view.updateAssets();
                     view.getUserControls().get("EndTurn").setDisable(true);
                     view.getUserControls().get("RollDice").setDisable(false);
                 });
@@ -245,10 +266,12 @@ public class MainController {
             if(transaction.canSettle()){
                 choice.add(transaction::settle);
                 currentPlayer.releaseFromJail();
+                LOG.debug(currentPlayer.getName() + " rolls the dice");
                 gameManager.getDice().roll();
             }
 
             choice.add(() -> {
+                LOG.debug(currentPlayer.getName() + " rolls the dice");
                 gameManager.getDice().roll();
             });
 
@@ -258,10 +281,12 @@ public class MainController {
                 return;
             else {
                 currentPlayer.releaseFromJail();
+                LOG.debug(currentPlayer.getName() + " rolls the dice");
                 gameManager.getDice().roll();
             }
         }
         else{
+            LOG.debug(currentPlayer.getName() + " rolls the dice");
             gameManager.getDice().roll();
         }
 
@@ -277,10 +302,12 @@ public class MainController {
                     choice = new Choice();
 
                     if(transaction.canSettle()) {
-                        choice.add(() -> transaction.settle());
+                        //make AI more likely to buy outright than go for auction
+                        for(int i = 0; i < 4; i ++)
+                            choice.add(transaction::settle);
                     }
 
-                    choice.add(() -> auctionHandler());
+                    choice.add(this::auctionHandler);
 
                     choice.decide();
                 }
@@ -291,6 +318,10 @@ public class MainController {
         }
         else{
             square.doAction(gameManager.getCurrentPlayer(), gameManager.getBoard());
+        }
+
+        if(currentPlayer.getCash() < 0){
+            fileBankruptcyHandler();
         }
 
         endTurnHandler();
@@ -476,12 +507,14 @@ public class MainController {
                     GridPane parent = (GridPane) pane.getParent();
                     parent.getChildren().remove(1);
                     parent.getChildren().add(generatePropertyManager(property));
+                    view.updateAssets();
                 });
             else mortgage.setOnAction(actionEvent -> {
                 property.mortgage();
                 GridPane parent = (GridPane) pane.getParent();
                 parent.getChildren().remove(1);
                 parent.getChildren().add(generatePropertyManager(property));
+                view.updateAssets();
             });
 
             pane.addRow(2, mortgage);
@@ -536,6 +569,7 @@ public class MainController {
                 GridPane parent = (GridPane) pane.getParent();
                 parent.getChildren().remove(1);
                 parent.getChildren().add(generatePropertyManager(property));
+                view.updateAssets();
             });
 
             Button devalue = new Button("Devalue property for £" + board.getImprovementCost(property.getGroup(), property.getLevel() == 5 ? 1 : 0));
@@ -546,6 +580,7 @@ public class MainController {
                 GridPane parent = (GridPane) pane.getParent();
                 parent.getChildren().remove(1);
                 parent.getChildren().add(generatePropertyManager(property));
+                view.updateAssets();
             });
 
             Button mortgage = new Button((property.isMortgaged() ? "Pay off mortgage" : "Mortgage") + " for £" + property.getCost()/2);
@@ -557,12 +592,14 @@ public class MainController {
                     GridPane parent = (GridPane) pane.getParent();
                     parent.getChildren().remove(1);
                     parent.getChildren().add(generatePropertyManager(property));
+                    view.updateAssets();
                 });
             else mortgage.setOnAction(actionEvent -> {
                 property.mortgage();
                 GridPane parent = (GridPane) pane.getParent();
                 parent.getChildren().remove(1);
                 parent.getChildren().add(generatePropertyManager(property));
+                view.updateAssets();
             });
 
             pane.addRow(2, improve, devalue, mortgage);
@@ -600,5 +637,46 @@ public class MainController {
         for(Button button : view.getUserControls().values()){
             button.setDisable(true);
         }
+    }
+
+    public void handleEndAbridged() {
+        LOG.debug("Time has run out!");
+
+        view.setDisable(true);
+
+        Player winner = gameManager.getPlayers().get(0);
+
+        for(Player player : gameManager.getPlayers()){
+            if(evaluate(player) > evaluate(winner)){
+                winner = player;
+            }
+        }
+
+        LOG.debug(winner.getName() + " wins the game!");
+    }
+
+    private int evaluate(Player player) {
+        int total = player.getCash();
+
+        for(PropertySquare prop : player.getProperties()){
+            if(prop.isMortgaged()){
+                total += prop.getCost()/2;
+            }
+            else{
+                total += prop.getCost();
+            }
+
+            if(prop.getGroup() != Group.STATION && prop.getGroup() != Group.UTILITIES){
+                if(prop.getLevel() < 5){
+                    total += prop.getLevel() * gameManager.getBoard().getImprovementCost(prop.getGroup(),0);
+                }
+                else if(prop.getLevel() == 5){
+                    total += prop.getLevel() * gameManager.getBoard().getImprovementCost(prop.getGroup(),0);
+                    total += gameManager.getBoard().getImprovementCost(prop.getGroup(),1);
+                }
+            }
+        }
+
+        return total;
     }
 }

@@ -143,6 +143,7 @@ public class Player implements Party {
 
         if(newPosition <= getPosition() && collectSalary){
             setCash(getCash() + 200);
+            LOG.debug(getName() + " has passed GO, collecting £200 salary");
 
             if(!canBuy)
                 canBuy = true;

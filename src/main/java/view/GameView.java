@@ -5,6 +5,8 @@ import javafx.scene.control.TextArea;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.shape.Rectangle;
+import javafx.scene.text.Font;
+import javafx.scene.text.FontWeight;
 import model.board.Group;
 import model.board.PropertySquare;
 import model.board.Square;
@@ -240,6 +242,11 @@ public class GameView extends StackPane {
                 propertyCards.getChildren().add(card);
             }
         }
+
+        Text cash = new Text("£" + player.getCash());
+        cash.setFont(Font.font("Arial", FontWeight.BOLD, 18));
+        assetsPane.getChildren().add(cash);
+        StackPane.setAlignment(cash, Pos.CENTER_RIGHT);
 
         pane.getChildren().addAll(namePane, assetsPane);
 

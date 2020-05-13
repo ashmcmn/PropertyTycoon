@@ -32,7 +32,7 @@
                            <HBox.margin>
                               <Insets right="20.0" />
                            </HBox.margin></CheckBox>
-                        <CheckBox fx:id="classicCheck" mnemonicParsing="false" onAction="#handleClassicCheck" text="Classic" />
+                        <CheckBox fx:id="classicCheck" disable="true" mnemonicParsing="false" onAction="#handleClassicCheck" selected="true" text="Classic" />
                      </children></HBox>
                </children>
                <padding>
@@ -45,10 +45,10 @@
                      <children>
                         <StackPane maxWidth="-Infinity" minWidth="-Infinity" prefHeight="150.0" prefWidth="70.0">
                            <children>
-                              <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Time Limit" wrappingWidth="59.4560546875" />
+                              <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Time Limit(m)" wrappingWidth="59.4560546875" />
                            </children>
                         </StackPane>
-                        <TextField maxWidth="-Infinity" />
+                        <TextField fx:id="timeLimit" maxWidth="-Infinity" />
                      </children>
                   </HBox>
                </children>
@@ -85,4 +85,7 @@
             </StackPane>
          </children></VBox>
    </children>
+   <padding>
+      <Insets left="20.0" right="20.0" />
+   </padding>
 </AnchorPane>

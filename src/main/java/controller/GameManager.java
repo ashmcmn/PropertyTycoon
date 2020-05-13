@@ -20,6 +20,9 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.Callable;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.IntStream;
 
 import org.apache.logging.log4j.LogManager;
@@ -47,6 +50,22 @@ public class GameManager {
         dice = new Dice();
 
         for (PrePlayer player : prePlayers) {
+            players.add(new Player(player.getName(), player.getToken(), 300, player.getAi()));
+        }
+
+        Collections.shuffle(players);
+
+        this.board = new Board(new Square[]{}, new Bank(50000), players);
+        currentPlayer = board.getPlayer(0);
+
+        loadConfig("config.json");
+    }
+
+    public GameManager(List<PrePlayer> prePlayers, long timeLimit) {
+        players = new LinkedList<>();
+        dice = new Dice();
+
+        for (PrePlayer player : prePlayers) {
             players.add(new Player(player.getName(), player.getToken(), 1500, player.getAi()));
         }
 
@@ -56,6 +75,9 @@ public class GameManager {
         currentPlayer = board.getPlayer(0);
 
         loadConfig("config.json");
+
+        ScheduledExecutorService execService = Executors.newScheduledThreadPool(1);
+        execService.schedule(() -> controller.handleEndAbridged(), timeLimit, TimeUnit.MINUTES);
     }
 
     public Dice getDice() {
