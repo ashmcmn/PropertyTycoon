@@ -44,6 +44,7 @@ public class GameManager {
     /**
      * Instantiates a new Game manager.
      *
+     * @param prePlayers player configuration for the game
      */
     public GameManager(List<PrePlayer> prePlayers) {
         players = new LinkedList<>();
@@ -61,6 +62,12 @@ public class GameManager {
         loadConfig("config.json");
     }
 
+    /**
+     * Instantiates a new Game manager for an abridged version.
+     *
+     * @param prePlayers player configuration for the game
+     * @param timeLimit  the time limit
+     */
     public GameManager(List<PrePlayer> prePlayers, long timeLimit) {
         players = new LinkedList<>();
         dice = new Dice();
@@ -80,12 +87,17 @@ public class GameManager {
         execService.schedule(() -> controller.handleEndAbridged(), timeLimit, TimeUnit.MINUTES);
     }
 
+    /**
+     * Gets the dice.
+     *
+     * @return the dice
+     */
     public Dice getDice() {
         return dice;
     }
 
     /**
-     * Gets board.
+     * Gets the board.
      *
      * @return the board
      */
@@ -94,7 +106,7 @@ public class GameManager {
     }
 
     /**
-     * Sets board.
+     * Sets the board.
      *
      * @param board the board
      */
@@ -112,96 +124,25 @@ public class GameManager {
     }
 
     /**
-     * Sets the current player.
+     * Gets players.
      *
-     * @return the current player
+     * @return the players
      */
-    public void setCurrentPlayer(Player currentPlayer) {
-        this.currentPlayer = currentPlayer;
-    }
-
     public List<Player> getPlayers() {
         return players;
     }
 
-    public boolean isEnded() {
-        return ended;
-    }
-
-    public void addTurn() {
-        turn++;
-    }
-
+    /**
+     * Gets turn.
+     *
+     * @return the turn
+     */
     public int getTurn() {
         return turn;
     }
 
     /**
-     * Starts the game.
-     */
-    public void startGame(){
-        LOG.debug("Starting the game");
-
-        while (!ended && turn < 1000){
-            LOG.debug(currentPlayer.getName() + " is taking their turn, " + turn);
-            if(currentPlayer.isJailed()){
-                LOG.debug(currentPlayer.getName() + " is in jail");
-                currentPlayer.addJailedTurn();
-                if(!currentPlayer.useGoof()){
-                    Transaction transaction = new Transaction(currentPlayer, board.getBank(), new Object[]{50}, new Object[]{});
-                    if(currentPlayer.getJailedTurns() == 3 && transaction.canSettle()){
-                        transaction.settle();
-                        currentPlayer.releaseFromJail();
-                        LOG.debug(currentPlayer.getName() + " paid out of jail");
-                    }
-                    else{
-                        if(players.indexOf(currentPlayer) == players.size()-1){
-                            currentPlayer = players.get(0);
-                        }
-                        else{
-                            currentPlayer = players.get(players.indexOf(currentPlayer) + 1);
-                        }
-                        continue;
-                    }
-                }
-                else LOG.debug(currentPlayer.getName() + " used a goof card");
-            }
-
-            dice.roll();
-            int[] result = dice.getResult();
-            LOG.debug(currentPlayer.getName() + " rolls the dice with a result of " + result[0] + " and " + result[1]);
-
-            Square square = currentPlayer.move(IntStream.of(result).sum(), true);
-            LOG.debug(currentPlayer.getName() + " landed on " + square.getName() + "(position: " + square.getPosition() + ")");
-            square.doAction(currentPlayer, board);
-
-            while(dice.wasDouble()) {
-                LOG.debug("A double was rolled so " + currentPlayer.getName() + " takes another turn");
-                dice.roll();
-                result = dice.getResult();
-
-                if(dice.getDoubles() == 3){
-                    currentPlayer.sendToJail();
-                    dice.resetDoubles();
-                    break;
-                }
-
-                square = currentPlayer.move(IntStream.of(result).sum(), true);
-                square.doAction(currentPlayer, board);
-            }
-
-            turn++;
-            if(players.indexOf(currentPlayer) == players.size()-1){
-                currentPlayer = players.get(0);
-            }
-            else{
-                currentPlayer = players.get(players.indexOf(currentPlayer) + 1);
-            }
-        }
-    }
-
-    /**
-     * Load game config from json file
+     * Load game config from a json file
      *
      * @param configPath the config file's path
      */
@@ -541,6 +482,9 @@ public class GameManager {
 
     }
 
+    /**
+     * End turn.
+     */
     public void endTurn() {
         turn++;
 
@@ -552,6 +496,11 @@ public class GameManager {
         }
     }
 
+    /**
+     * Sets the controller.
+     *
+     * @param controller the controller
+     */
     public void setController(MainController controller) {
         this.controller = controller;
     }

@@ -1,6 +1,7 @@
 package model.transactions;
 
 import model.board.PropertySquare;
+import model.party.Bank;
 import model.party.Party;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -68,6 +69,10 @@ public class Transaction {
                 LOG.debug(partyOne.getName() + " has paid " + partyTwo.getName() + " £" + item);
                 partyOne.setCash(partyOne.getCash() - ((Integer) item));
                 partyTwo.setCash(partyTwo.getCash() + ((Integer) item));
+                if(!(partyOne instanceof Bank))
+                    LOG.debug(partyOne.getName() + " now has £" + partyOne.getCash());
+                if(!(partyTwo instanceof Bank))
+                    LOG.debug(partyTwo.getName() + " now has £" + partyTwo.getCash());
             }
             else if(item instanceof PropertySquare){
                 LOG.debug(partyOne.getName() + " has given " + partyTwo.getName() + " " + ((PropertySquare) item).getName());
@@ -82,6 +87,10 @@ public class Transaction {
                 LOG.debug(partyTwo.getName() + " has paid " + partyOne.getName() + " £" + item);
                 partyTwo.setCash(partyTwo.getCash() - ((Integer) item));
                 partyOne.setCash(partyOne.getCash() + ((Integer) item));
+                if(!(partyOne instanceof Bank))
+                    LOG.debug(partyOne.getName() + " now has £" + partyOne.getCash());
+                if(!(partyTwo instanceof Bank))
+                    LOG.debug(partyTwo.getName() + " now has £" + partyTwo.getCash());
             }
             else if(item instanceof PropertySquare){
                 LOG.debug(partyTwo.getName() + " has given " + partyOne.getName()+ " " + ((PropertySquare) item).getName());

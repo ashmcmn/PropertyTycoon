@@ -1,6 +1,5 @@
 package view;
 
-import javafx.beans.property.Property;
 import model.board.Group;
 import model.board.PropertySquare;
 import model.board.Square;
@@ -35,7 +34,6 @@ public class GameBoardGenerator {
         this.width = width;
         this.height = height;
     }
-
 
 
     /**

@@ -138,6 +138,13 @@ public class GameView extends StackPane {
         return userPane;
     }
 
+    /**
+     * Generate user assets grid pane.
+     *
+     * @param width  the width
+     * @param height the height
+     * @return the grid pane
+     */
     public GridPane generateUserAssets(double width, double height) {
         Player player = controller.getGameManager().getCurrentPlayer();
 
@@ -253,10 +260,18 @@ public class GameView extends StackPane {
         return pane;
     }
 
+    /**
+     * Generate user assets grid pane.
+     *
+     * @return the grid pane
+     */
     public GridPane generateUserAssets(){
         return generateUserAssets(userPane.getWidth(), userPane.getHeight()/3);
     }
 
+    /**
+     * Update assets.
+     */
     public void updateAssets() {
         userPane.getChildren().remove(0);
         userPane.getChildren().add(0, generateUserAssets());
@@ -354,6 +369,7 @@ public class GameView extends StackPane {
             ImageView imageView = new ImageView();
             imageView.setImage(token);
             imageView.setFitWidth(50);
+            imageView.setFitHeight(50);
             imageView.setPreserveRatio(true);
             imageView.setSmooth(true);
             imageView.setCache(true);
@@ -379,10 +395,20 @@ public class GameView extends StackPane {
         return controller;
     }
 
+    /**
+     * Gets game board.
+     *
+     * @return the game board
+     */
     public GridPane getGameBoard() {
         return gameBoard;
     }
 
+    /**
+     * Gets user controls.
+     *
+     * @return the user controls
+     */
     public Map<String, Button> getUserControls() {
         return userControls;
     }

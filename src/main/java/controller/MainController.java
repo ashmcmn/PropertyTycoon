@@ -1,6 +1,5 @@
 package controller;
 
-import javafx.beans.property.Property;
 import javafx.geometry.HPos;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -8,7 +7,6 @@ import javafx.geometry.VPos;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
-import javafx.scene.control.TextField;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
@@ -26,52 +24,80 @@ import model.menu.PrePlayer;
 import model.players.Choice;
 import model.players.Player;
 import model.transactions.Transaction;
-import utilities.Utilities;
-import view.GameView;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import view.GameView;
 
-import javax.swing.*;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Map;
-import java.util.Random;
-import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
+/**
+ * The type controller that runs the game as an intermediary between the game view and models, along with a game manager
+ */
 public class MainController {
     private GameManager gameManager;
     private GameView view;
     private Stage stage;
     private static final Logger LOG = LogManager.getLogger(MainController.class);
 
+    /**
+     * Instantiates a new Main controller.
+     *
+     * @param stage      the stage
+     * @param prePlayers the pre players
+     */
     public MainController(Stage stage, List<PrePlayer> prePlayers) {
         gameManager = new GameManager(prePlayers);
         gameManager.setController(this);
     }
 
+    /**
+     * Instantiates a new Main controller.
+     *
+     * @param stage      the stage
+     * @param prePlayers the pre players
+     * @param timeLimit  the time limit
+     */
     public MainController(Stage stage, List<PrePlayer> prePlayers, long timeLimit) {
         gameManager = new GameManager(prePlayers, timeLimit);
         gameManager.setController(this);
     }
 
+    /**
+     * Gets game manager.
+     *
+     * @return the game manager
+     */
     public GameManager getGameManager() {
         return gameManager;
     }
 
+    /**
+     * Gets view.
+     *
+     * @return the view
+     */
     public GameView getView() {
         return view;
     }
 
+    /**
+     * Gets stage.
+     *
+     * @return the stage
+     */
     public Stage getStage() {
         return stage;
     }
 
+    /**
+     * Handles the events of rolling the dice and related tasks
+     */
     public void rollDiceHandler() {
-        LOG.debug(gameManager.getCurrentPlayer().getName() + " rolls the dice");
+        LOG.debug(gameManager.getCurrentPlayer().getNameToken() + " rolls the dice");
         gameManager.getDice().roll();
 
         if(!gameManager.getDice().wasDouble()) {
@@ -80,29 +106,28 @@ public class MainController {
 
             if(gameManager.getCurrentPlayer().isJailed()){
                 gameManager.getCurrentPlayer().addJailedTurn();
+                view.getUserControls().get("EndTurn").setDisable(false);
                 if(gameManager.getCurrentPlayer().getJailedTurns() == 3) {
-                    LOG.debug(gameManager.getCurrentPlayer().getName() + " has been in jail 3 turns so they have been released");
+                    LOG.debug(gameManager.getCurrentPlayer().getNameToken() + " has been in jail 3 turns so they have been released");
                     gameManager.getCurrentPlayer().releaseFromJail();
-                    view.getUserControls().get("EndTurn").setDisable(false);
                 }
-                else LOG.debug("A double was not rolled so " + gameManager.getCurrentPlayer().getName() + " stays in jail");
-                return;
+                else LOG.debug("A double was not rolled so " + gameManager.getCurrentPlayer().getNameToken() + " stays in jail");
             }
         }
         else{
             if(gameManager.getCurrentPlayer().isJailed()){
-                LOG.debug("A double was rolled so " + gameManager.getCurrentPlayer().getName() + " is released from jail");
-                gameManager.getCurrentPlayer().releaseFromJail();
-                gameManager.getDice().resetDoubles();
-            }
+            gameManager.getCurrentPlayer().releaseFromJail();
+            gameManager.getDice().resetDoubles();
+        }
             else if(gameManager.getDice().getDoubles() == 3){
                 gameManager.getCurrentPlayer().sendToJail();
                 gameManager.getDice().resetDoubles();
                 view.getUserControls().get("RollDice").setDisable(true);
                 view.getUserControls().get("EndTurn").setDisable(false);
+                return;
             }
             else{
-                LOG.debug("A double was rolled so " + gameManager.getCurrentPlayer().getName() + " will take another turn");
+                LOG.debug("A double was rolled so " + gameManager.getCurrentPlayer().getNameToken() + " will take another turn");
             }
         }
 
@@ -140,12 +165,20 @@ public class MainController {
         }
     }
 
+    /**
+     * Sets the view component.
+     *
+     * @param view the view
+     */
     public void setView(GameView view) {
         this.view = view;
     }
 
+    /**
+     * End turn handler.
+     */
     public void endTurnHandler() {
-        LOG.debug(gameManager.getCurrentPlayer().getName() + " has ended their turn");
+        LOG.debug(gameManager.getCurrentPlayer().getNameToken() + " has ended their turn");
 
         gameManager.endTurn();
 
@@ -255,6 +288,9 @@ public class MainController {
         view.updateAssets();
     }
 
+    /**
+     * Handle the turn of an AI player
+     */
     public void handleAITurn() {
         Player currentPlayer = gameManager.getCurrentPlayer();
 
@@ -264,10 +300,13 @@ public class MainController {
             Transaction transaction = new Transaction(currentPlayer, gameManager.getBoard().getBank(), new Object[]{50}, new Object[]{});
 
             if(transaction.canSettle()){
-                choice.add(transaction::settle);
-                currentPlayer.releaseFromJail();
-                LOG.debug(currentPlayer.getName() + " rolls the dice");
-                gameManager.getDice().roll();
+                choice.add(() -> {
+                    transaction.settle();
+                    LOG.debug(currentPlayer.getName() + " paid their way out of jail");
+                    currentPlayer.releaseFromJail();
+                    LOG.debug(currentPlayer.getName() + " rolls the dice");
+                    gameManager.getDice().roll();
+                });
             }
 
             choice.add(() -> {
@@ -277,15 +316,21 @@ public class MainController {
 
             choice.decide();
 
-            if(!gameManager.getDice().wasDouble() && currentPlayer.isJailed())
+            if(!gameManager.getDice().wasDouble() && currentPlayer.isJailed()) {
+                endTurnHandler();
                 return;
-            else {
+            }
+            else if(gameManager.getDice().wasDouble() && currentPlayer.isJailed()) {
                 currentPlayer.releaseFromJail();
                 LOG.debug(currentPlayer.getName() + " rolls the dice");
                 gameManager.getDice().roll();
             }
         }
         else{
+            if(gameManager.getDice().getDoubles() == 3){
+                currentPlayer.sendToJail();
+                gameManager.getDice().resetDoubles();
+            }
             LOG.debug(currentPlayer.getName() + " rolls the dice");
             gameManager.getDice().roll();
         }
@@ -324,9 +369,14 @@ public class MainController {
             fileBankruptcyHandler();
         }
 
-        endTurnHandler();
+        if(!currentPlayer.isJailed() && gameManager.getDice().wasDouble())
+            handleAITurn();
+        else endTurnHandler();
     }
 
+    /**
+     * Buy property handler.
+     */
     public void buyPropertyHandler() {
         PropertySquare property = (PropertySquare) gameManager.getBoard().getSquares()[gameManager.getCurrentPlayer().getPosition()];
 
@@ -347,9 +397,12 @@ public class MainController {
         }
 
         view.updateAssets();
-        LOG.debug(gameManager.getCurrentPlayer().getName() + " is buying " + property.getName());
+        LOG.debug(gameManager.getCurrentPlayer().getNameToken() + " is buying " + property.getName());
     }
 
+    /**
+     * Auction handler.
+     */
     public void auctionHandler() {
         PropertySquare property = (PropertySquare) gameManager.getBoard().getSquares()[gameManager.getCurrentPlayer().getPosition()];
         List<Player> potentialBuyers = gameManager.getPlayers().stream().filter(Player::canBuy).collect(Collectors.toList());
@@ -358,6 +411,9 @@ public class MainController {
         view.updateAssets();
     }
 
+    /**
+     * Manage properties handler.
+     */
     public void managePropertiesHandler() {
         Stage dialog = new Stage();
         GridPane pane = new GridPane();
@@ -467,6 +523,12 @@ public class MainController {
         dialog.show();
     }
 
+    /**
+     * Generate the property manager window for a given property
+     *
+     * @param property the property
+     * @return the grid pane
+     */
     public GridPane generatePropertyManager(PropertySquare property){
         GridPane pane = new GridPane();
         pane.setPrefWidth(500);
@@ -613,6 +675,9 @@ public class MainController {
         return pane;
     }
 
+    /**
+     * File bankruptcy handler.
+     */
     public void fileBankruptcyHandler() {
         Player player = gameManager.getCurrentPlayer();
 
@@ -631,14 +696,20 @@ public class MainController {
         else endTurnHandler();
     }
 
-    private void endGameHandler() {
-        LOG.debug(gameManager.getPlayers().get(0).getName() + " wins the game!");
+    /**
+     * End game handler.
+     */
+    public void endGameHandler() {
+        LOG.debug(gameManager.getPlayers().get(0).getNameToken() + " wins the game!");
 
         for(Button button : view.getUserControls().values()){
             button.setDisable(true);
         }
     }
 
+    /**
+     * Handle the end of an abridged game
+     */
     public void handleEndAbridged() {
         LOG.debug("Time has run out!");
 
@@ -652,10 +723,16 @@ public class MainController {
             }
         }
 
-        LOG.debug(winner.getName() + " wins the game!");
+        LOG.debug(winner.getNameToken() + " wins the game!");
     }
 
-    private int evaluate(Player player) {
+    /**
+     * Evaluates a player in the abridged version
+     *
+     * @param player the player
+     * @return the int
+     */
+    public int evaluate(Player player) {
         int total = player.getCash();
 
         for(PropertySquare prop : player.getProperties()){

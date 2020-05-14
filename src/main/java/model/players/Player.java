@@ -33,6 +33,9 @@ public class Player implements Party {
     private int jailedTurns = 0;
     private int goof;
     private Node boardPiece;
+    /**
+     * The constant LOG.
+     */
     protected static final Logger LOG = LogManager.getLogger(Player.class);
 
     /**
@@ -41,6 +44,7 @@ public class Player implements Party {
      * @param name  the player's name
      * @param token the token to represent the player's position on the board
      * @param cash  the amount of cash currently held by the player
+     * @param AI    the ai
      */
     public Player(String name, Token token, int cash, boolean AI) {
         this.name = name;
@@ -189,6 +193,7 @@ public class Player implements Party {
     public void sendToJail() {
         jailed = true;
         setPosition(Stream.of(board.getSquares()).filter(JailSquare.class::isInstance).collect(Collectors.toList()).get(0).getPosition());
+        LOG.debug(getNameToken() + "has been sent to jail");
     }
 
     /**
@@ -206,6 +211,12 @@ public class Player implements Party {
                 .collect(Collectors.toList()));
     }
 
+    /**
+     * Can improve boolean.
+     *
+     * @param property the property
+     * @return the boolean
+     */
     public boolean canImprove(PropertySquare property){
         int type = 0;
         if(property.getLevel() == 4)
@@ -254,6 +265,12 @@ public class Player implements Party {
         return true;
     }
 
+    /**
+     * Can devalue boolean.
+     *
+     * @param property the property
+     * @return the boolean
+     */
     public boolean canDevalue(PropertySquare property){
         if(ownsGroup(property.getGroup())){
             return property.canRemoveLevel();
@@ -313,8 +330,14 @@ public class Player implements Party {
     public void releaseFromJail() {
         jailed = false;
         jailedTurns = 0;
+        LOG.debug(getNameToken() + " has been released from jail");
     }
 
+    /**
+     * Has goof boolean.
+     *
+     * @return the boolean
+     */
     public boolean hasGoof() {
         if(goof > 0){
             return true;
@@ -322,6 +345,11 @@ public class Player implements Party {
         return false;
     }
 
+    /**
+     * Use a get out of jail free card if available
+     *
+     * @return the boolean
+     */
     public boolean useGoof() {
         if(goof > 0){
             goof--;
@@ -331,19 +359,48 @@ public class Player implements Party {
         return false;
     }
 
+    /**
+     * Gets board piece.
+     *
+     * @return the board piece
+     */
     public Node getBoardPiece() {
         return boardPiece;
     }
 
+    /**
+     * Sets board piece.
+     *
+     * @param boardPiece the board piece
+     */
     public void setBoardPiece(Node boardPiece) {
         this.boardPiece = boardPiece;
     }
 
+    /**
+     * Whether or not a player has completed a circuit
+     *
+     * @return the boolean
+     */
     public boolean canBuy() {
         return canBuy;
     }
 
+    /**
+     * Is the player AI controlled
+     *
+     * @return the boolean
+     */
     public boolean isAI() {
         return AI;
+    }
+
+    /**
+     * Gets name token.
+     *
+     * @return the name token
+     */
+    public String getNameToken() {
+        return getName() + "(" + token.name() + ")";
     }
 }

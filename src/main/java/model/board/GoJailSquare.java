@@ -30,7 +30,6 @@ public class GoJailSquare extends Square {
      */
     @Override
     public void doAction(Player player, Board board) {
-        LOG.debug("Sending " + player.getName() + " to jail");
         player.sendToJail();
     }
 }

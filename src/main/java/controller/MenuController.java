@@ -1,8 +1,6 @@
 package controller;
 
-import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
-import javafx.fxml.FXML;
 import javafx.geometry.Pos;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.Scene;
@@ -10,7 +8,10 @@ import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.TextField;
-import javafx.scene.layout.*;
+import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.StackPane;
+import javafx.scene.layout.VBox;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
 import model.menu.PrePlayer;
@@ -22,12 +23,29 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+/**
+ * The type Menu controller.
+ */
 public class MenuController {
 
+    /**
+     * The View.
+     */
     AnchorPane view;
+    /**
+     * The Players.
+     */
     List<PrePlayer> players;
+    /**
+     * The Primary stage.
+     */
     Stage primaryStage;
 
+    /**
+     * Instantiates a new Menu controller.
+     *
+     * @param primaryStage the primary stage
+     */
     public MenuController(Stage primaryStage) {
         players = new ArrayList<>();
 
@@ -37,10 +55,18 @@ public class MenuController {
         this.primaryStage = primaryStage;
     }
 
+    /**
+     * Sets view.
+     *
+     * @param view the view
+     */
     public void setView(AnchorPane view) {
         this.view = view;
     }
 
+    /**
+     * Updates the list of players
+     */
     public void updatePlayerList() {
         HBox playerList = (HBox) view.lookup("#playerList");
 
@@ -107,11 +133,17 @@ public class MenuController {
         Button button = new Button("Add Player");
         button.setOnAction(this::handleAddPlayer);
 
-        pane.getChildren().add(button);
+        if(players.size() < 7)
+            pane.getChildren().add(button);
         playerList.getChildren().add(pane);
         ((AnchorPane) playerList.getParent()).setPrefWidth((players.size() + 1) * 200);
     }
 
+    /**
+     * Handle the event of abridged game checkbox being ticked
+     *
+     * @param actionEvent the action event
+     */
     public void handleAbridgedCheck(ActionEvent actionEvent) {
         ((CheckBox) view.lookup("#classicCheck")).setSelected(false);
         view.lookup("#abridgedCheck").setDisable(true);
@@ -119,6 +151,11 @@ public class MenuController {
         view.lookup("#timeLimitPane").setVisible(true);
     }
 
+    /**
+     * Handle the event of classic game checkbox being ticked
+     *
+     * @param actionEvent the action event
+     */
     public void handleClassicCheck(ActionEvent actionEvent) {
         ((CheckBox) view.lookup("#abridgedCheck")).setSelected(false);
         view.lookup("#classicCheck").setDisable(true);
@@ -126,12 +163,20 @@ public class MenuController {
         view.lookup("#timeLimitPane").setVisible(false);
     }
 
+    /**
+     * Handle the adding of a new player.
+     *
+     * @param actionEvent the action event
+     */
     public void handleAddPlayer(ActionEvent actionEvent) {
         players.add(new PrePlayer("New", false));
 
         updatePlayerList();
     }
 
+    /**
+     * Handle start game.
+     */
     public void handleStartGame() {
         Rectangle2D screenBounds = Screen.getPrimary().getVisualBounds();
         MainController controller;

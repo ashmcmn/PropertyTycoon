@@ -1,5 +1,6 @@
 package model.auction;
 
+import controller.GameManager;
 import controller.MainController;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -14,6 +15,8 @@ import model.board.PropertySquare;
 import model.party.Bank;
 import model.players.Player;
 import model.transactions.Transaction;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import view.GameView;
 
 import java.util.*;
@@ -26,13 +29,18 @@ public class Auction {
     private PropertySquare property;
     private List<Player> players;
     private Bank bank;
+    /**
+     * The Bids.
+     */
     Map<Player, Integer> bids;
+    private static final Logger LOG = LogManager.getLogger(Auction.class);
 
     /**
      * Instantiates a new Auction.
      *
      * @param property the property
      * @param players  the players
+     * @param bank     the bank
      */
     public Auction(PropertySquare property, List<Player> players, Bank bank) {
         this.property = property;
@@ -48,6 +56,7 @@ public class Auction {
     /**
      * Settles the auction returning the winning player
      *
+     * @param controller the controller
      * @return the winner
      */
     public void settle(MainController controller) {
@@ -68,6 +77,11 @@ public class Auction {
         }
     }
 
+    /**
+     * Gets bids recursively.
+     *
+     * @param controller the controller
+     */
     public void getBids(MainController controller) {
         Player player = null;
         try {
@@ -94,10 +108,11 @@ public class Auction {
                     bid = 0;
                 }
                 else{
-                    bid = (int) (rand.nextInt((int) (player.getCash()*0.4)) + player.getCash()*0.8);
+                    bid = (int) (rand.nextInt((int) (player.getCash()*0.2)) + player.getCash()*0.8);
                 }
 
                 bids.put(player, bid);
+                LOG.debug(player.getNameToken() + " has bid £" + bid);
                 getBids(controller);
             }
             else {
@@ -121,6 +136,7 @@ public class Auction {
                 Player finalPlayer = player;
                 submit.setOnAction(actionEvent -> {
                     bids.put(finalPlayer, Integer.valueOf(input.getText()));
+                    LOG.debug(finalPlayer.getNameToken() + " has bid £" + Integer.valueOf(input.getText()));
                     dialog.close();
                     getBids(controller);
                 });
@@ -141,7 +157,7 @@ public class Auction {
                 dialog.setTitle(player.getName() + " enter bid");
                 dialog.setScene(scene);
                 dialog.initOwner(controller.getStage());
-                dialog.show();
+                dialog.showAndWait();
             }
         }
     }

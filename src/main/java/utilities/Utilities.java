@@ -2,11 +2,12 @@ package utilities;
 
 import javafx.scene.Node;
 import javafx.scene.layout.GridPane;
-import javafx.scene.layout.StackPane;
-import model.board.Square;
 
 import java.util.stream.Collectors;
 
+/**
+ * The type Utilities.
+ */
 public class Utilities {
 
     /**
