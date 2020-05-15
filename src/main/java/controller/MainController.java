@@ -111,7 +111,10 @@ public class MainController {
                     LOG.debug(gameManager.getCurrentPlayer().getNameToken() + " has been in jail 3 turns so they have been released");
                     gameManager.getCurrentPlayer().releaseFromJail();
                 }
-                else LOG.debug("A double was not rolled so " + gameManager.getCurrentPlayer().getNameToken() + " stays in jail");
+                else {
+                    LOG.debug("A double was not rolled so " + gameManager.getCurrentPlayer().getNameToken() + " stays in jail");
+                    return;
+                }
             }
         }
         else{
